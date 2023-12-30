@@ -1325,7 +1325,7 @@ function Library:Notify(NotifConfig)
     Parent = Utility["GUI2"],
     AnchorPoint = Vector2.new(1, 1),
     Position = UDim2.new(1, -10, 1, -10),
-    Size = UDim2.new(0, 250, 0, 80),
+    Size = UDim2.new(0, 200, 0, 50),
     BackgroundColor3 = Settings.Themes[Settings.SelectedTheme].accent,
     BorderSizePixel = 0
   })
@@ -1342,7 +1342,7 @@ function Library:Notify(NotifConfig)
     TextColor3 = Settings.Themes[Settings.SelectedTheme].text
   })
   Utility["NotifLabel"] = Library:create('TextLabel', {
-    Name = 'Label',
+    Name = 'ZLabel',
     Parent = Utility["NotifFrame"],
     Size = UDim2.new(1, -10, 0, 20),
     Position = UDim2.new(0, 10, 0, 0),
@@ -1359,11 +1359,10 @@ function Library:Notify(NotifConfig)
   Library:create("UIListLayout", {
     Padding = UDim.new(0, 2),
     HorizontalAlignment = Enum.HorizontalAlignment.Center,
-    SortOrder = Enum.SortOrder.LayoutOrder,
     Parent = Utility["NotifFrame"]
   })
   Library:create("UICorner", {
-    CornerRadius = Udim.new(0, 10),
+    CornerRadius = 10,
     Parent = Utility["NotifFrame"]
   })
   Library:create("UIStroke", {
