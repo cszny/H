@@ -1379,17 +1379,6 @@ function Library:ShowError(ErrorConfig)
     })
   end 
   
-  
 end
 
-local w = Library:MakeWindow({
-  Name = "Hikari",
-  Subtitle = "ShitAss",
-  Theme = "Purple",
-  Intro = true,
-  IntroIcon = "rbxassetid://15803005314"
-})
-local t1 = w:MakeTab({
-  Name = "Tab1",
-  Default = true
-})
+return Library
