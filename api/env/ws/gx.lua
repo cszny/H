@@ -56,7 +56,7 @@ local Settings = {
       activeColor = Color3.fromHex("D1BDFF"),
     },
   },
-  SelectedTheme = "Purple",
+  SelectedTheme = "Default",
 }
 
 -- // Utility Function
@@ -132,12 +132,12 @@ function Function:Draggable(gui)
 	end)
 end
 function Function:DestroyUI()
-  if CoreGui:FindFirstChild("hikariCheat") ~= nil or CoreGui:FindFirstChild("ErroGui") ~= nil then
+  if CoreGui:FindFirstChild("hikariCheat") ~= nil or CoreGui:FindFirstChild("NotifLib") ~= nil then
     CoreGui:FindFirstChild("hikariCheat"):Destroy()
-    CoreGui:FindFirstChild("ErroGui"):Destroy()
-  elseif gethui():FindFirstChild("hikariCheat") ~= nil or gethui():FindFirstChild("ErroGui") ~= nil then
+    CoreGui:WaitForChild("NotifLib"):Destroy()
+  elseif gethui():FindFirstChild("hikariCheat") ~= nil or gethui():FindFirstChild("NotifLib") ~= nil then
     gethui():FindFirstChild("hikariCheat"):Destroy()
-    gethui():FindFirstChild("ErroGui"):Destroy()
+    gethui():WaitForChild("NotifLib"):Destroy()
   end
 end
 
@@ -194,7 +194,7 @@ function Library:create(className, properties)
     return inst
 end
 
-function Library:MakeWindow(WindowConfig)
+function Library:NewWindow(WindowConfig)
   WindowConfig = WindowConfig or {}
   WindowConfig.Name = WindowConfig.Name or "Hikari Cheat"
   WindowConfig.Subtitle = WindowConfig.Subtitle or "hikariCheat"
@@ -495,7 +495,7 @@ function Library:MakeWindow(WindowConfig)
   end
   
   local Tabs = {}
-  function Tabs:MakeTab(options)
+  function Tabs:NewTab(options)
     options.Name = options.Name or "Tab"
     options.Icon = options.Icon or ""
     options.Default = options.Default or false
@@ -1307,77 +1307,75 @@ function Library:MakeWindow(WindowConfig)
   
   return Tabs
 end
-function Library:ShowError(ErrorConfig)
-  ErrorConfig = ErrorConfig or {}
-  ErrorConfig.Text = ErrorConfig.Text or "Error Text"
-  ErrorConfig.Icon = ErrorConfig.Icon or ""
+function Library:Notify(NotifConfig)
+  NotifConfig = NotifConfig or {}
+  NotifConfig.Text = NotifConfig.Text or "ShitGUI"
+  NotifConfig.Label = NotifConfig.Label or "Notification by Hikari Shit GUI"
+  NotifConfig.Time = NotifConfig.Time or 5
   
-  do
-    Utility["GUI2"] = Library:create("ScreenGui", {
-      DisplayOrder = 11, 
-      IgnoreGuiInset = true, 
-      Name = "ErrorGui", 
-      Parent = CoreGui,
-      ResetOnSpawn = false
-    })
-    Utility["ErrorFrame"] = Library:create("Frame", {
-      Name = "Intro",
-      AnchorPoint = Vector2.new(0.5, 0.5),
-      Position = UDim2.new(0.5, 0, 0.5, 0),
-      Size = UDim2.new(0, 420, 0, 290),
-      BackgroundTransparency = 0,
-      BorderSizePixel = 0,
-      Parent = Utility["GUI2"]
-    })
-    Utility["ErrorIcon"] = Library:create("ImageLabel", {
-      Name = "Icon",
-      Size = UDim2.new(0, 100, 0, 100),
-      Parent = Utility["ErrorFrame"],
-      Image = ErrorConfig.Icon,
-      BackgroundTransparency = 1,
-      AnchorPoint = Vector2.new(0.5, 0.5),
-      Position = UDim2.new(0.5, 0, 0.5, 0)
-    })
-    Utility["ErrorText"] = Library:create("TextLabel", {
-      Name = "Text",
-      Size = UDim2.new(1, 0, 0, 30),
-      Parent = Utility["ErrorFrame"],
-      Text = ErrorConfig.Text,
-      Font = Enum.Font.GothamBold,
-      TextSize = 20,
-      TextColor3 = Color3.fromRGB(255, 140, 140),
-      RichText = true,
-      BackgroundTransparency = 1,
-      AnchorPoint = Vector2.new(0.5, 1),
-      Position = UDim2.new(0.5, 0, 1, -20)
-    })
-    
-    Library:create("UICorner", {
-      CornerRadius = UDim.new(0, 50),
-      Parent = Utility["ErrorIcon"]
-    })
-    Library:create("UICorner", {
-      CornerRadius = UDim.new(0, 5),
-      Parent = Utility["ErrorFrame"]
-    })
-    Library:create("UIStroke", {
-      Color = Color3.fromRGB(255, 120, 120),
-      Thickness = 1.3,
-      Parent = Utility["ErrorIcon"]
-    })
-    
-    TweenService:Create(Utility["ErrorIcon"], TweenInfo.new(10, Enum.EasingStyle.Linear, Enum.EasingDirection.Out, -1, false, 0), {Rotation = 360}):Play()
-    
-    Utility["Gradient"] = Library:create("UIGradient", {
-      Name = "Gradient",
-      Parent = Utility["ErrorFrame"],
-      Rotation = 45,
-      Color = ColorSequence.new{
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 55, 55)), -- Top color
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(37, 23, 23))  -- Bottom color
-      }
-    })
-  end 
+  Utility["GUI2"] = Library:create("ScreenGui", {
+    DisplayOrder = 11, 
+    IgnoreGuiInset = true, 
+    Name = "NotifLib", 
+    Parent = CoreGui,
+    ResetOnSpawn = false
+  })
+  Utility["NotifFrame"] = Library:create('Frame', {
+    Name = NotifConfig.Text.."Frame",
+    Parent = Utility["GUI2"],
+    AnchorPoint = Vector2.new(1, 1),
+    Position = UDim2.new(1, -10, 1, -10),
+    Size = UDim2.new(0, 250, 0, 80),
+    BackgroundColor3 = Settings.Themes[Settings.SelectedTheme].accent,
+    BorderSizePixel = 0
+  })
+  Utility["NotifText"] = Library:create('TextLabel', {
+    Name = 'Text',
+    Parent = Utility["NotifFrame"],
+    Size = UDim2.new(1, -10, 0, 20),
+    Position = UDim2.new(0, 10, 0, 0),
+    Text = NotifConfig.Text,
+    BackgroundTransparency = 1,
+    Font = Enum.Font.GothamSemibold,
+    TextSize = 13,
+    TextXAlignment = Enum.TextXAlignment.Left,
+    TextColor3 = Settings.Themes[Settings.SelectedTheme].text
+  })
+  Utility["NotifLabel"] = Library:create('TextLabel', {
+    Name = 'Label',
+    Parent = Utility["NotifFrame"],
+    Size = UDim2.new(1, -10, 0, 20),
+    Position = UDim2.new(0, 10, 0, 0),
+    Text = NotifConfig.Text,
+    BackgroundTransparency = 1,
+    Font = Enum.Font.Gotham,
+    TextSize = 10,
+    TextTruncate = Enum.TextTruncate.AtEnd,
+    TextWrapped = true,
+    TextXAlignment = Enum.TextXAlignment.Left,
+    TextColor3 = Settings.Themes[Settings.SelectedTheme].muted
+  })
+  
+  Library:create("UIListLayout", {
+    Padding = UDim.new(0, 2),
+    HorizontalAlignment = Enum.HorizontalAlignment.Center,
+    SortOrder = Enum.SortOrder.LayoutOrder,
+    Parent = Utility["NotifFrame"]
+  })
+  Library:create("UICorner", {
+    CornerRadius = Udim.new(0, 10),
+    Parent = Utility["NotifFrame"]
+  })
+  Library:create("UIStroke", {
+    Color = Settings.Themes[Settings.SelectedTheme].stroke,
+    Thickness = .5,
+    Parent = Utility["NotifFrame"]
+  })
+
+  if WindowConfig.Time then
+    wait(WindowConfig.Time)
+    Utility["GUI2"]:Destroy()
+  end
   
 end
 
