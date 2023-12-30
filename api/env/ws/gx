@@ -1332,8 +1332,9 @@ function Library:Notify(NotifConfig)
   Utility["NotifText"] = Library:create('TextLabel', {
     Name = 'Text',
     Parent = Utility["NotifFrame"],
-    Size = UDim2.new(1, -10, 0, 15),
-    Position = UDim2.new(0, 10, 0, 10),
+    AnchorPoint = Vector2.new(0, 0.5),
+    Size = UDim2.new(1, -10, 0, 10),
+    Position = UDim2.new(0, 10, 0.5, -5),
     Text = NotifConfig.Text,
     BackgroundTransparency = 1,
     Font = Enum.Font.GothamSemibold,
@@ -1345,7 +1346,7 @@ function Library:Notify(NotifConfig)
     Name = 'ZLabel',
     Parent = Utility["NotifFrame"],
     Size = UDim2.new(1, -10, 0, 10),
-    Position = UDim2.new(0, 10, 0, 0),
+    Position = UDim2.new(0, 10, 0, 5),
     Text = NotifConfig.Text,
     BackgroundTransparency = 1,
     Font = Enum.Font.Gotham,
@@ -1371,8 +1372,8 @@ function Library:Notify(NotifConfig)
     Parent = Utility["NotifFrame"]
   })
 
-  if WindowConfig.Time then
-    wait(WindowConfig.Time)
+  if NotifConfig.Time then
+    wait(NotifConfig.Time)
     Utility["GUI2"]:Destroy()
   end
   
