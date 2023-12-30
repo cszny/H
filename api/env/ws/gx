@@ -1,1 +1,1395 @@
-print("hello world")
+-- // Variables
+local HttpService = game:GetService("HttpService")
+local TextService = game:GetService("TextService")
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local CoreGui = game:GetService("CoreGui")
+local ContentProvider = game:GetService("ContentProvider")
+local LocalPlayer = game:GetService("Players").LocalPlayer
+
+local Connections = {
+	connections = {}
+}
+local Function = {}
+local Library = {}
+local Utility = {}
+local Settings = {
+  Themes = {
+    ["Default"] = {
+      text = Color3.fromRGB(238, 238, 240),
+      muted = Color3.fromRGB(79,79,86),
+      background = Color3.fromRGB(25, 25, 25),
+      primary = Color3.fromRGB(15, 15, 15),
+      secondary = Color3.fromRGB(30, 30, 30),
+      accent = Color3.fromRGB(10, 10, 10),
+      stroke = Color3.fromRGB(50, 50, 50),
+      activeColor = Color3.fromRGB(104,255,160),
+    },
+    ["Purple"] = {
+      text = Color3.fromRGB(238, 238, 240),
+      muted = Color3.fromRGB(79,79,86),
+      background = Color3.fromRGB(30, 30, 45),
+      primary = Color3.fromRGB(40, 40, 60),
+      secondary = Color3.fromRGB(60, 60, 80),
+      accent = Color3.fromRGB(60, 60, 80),
+      stroke = Color3.fromRGB(60, 60, 80),
+      activeColor = Color3.fromRGB(96,255,150),
+    },
+    ["Ocean"] = {
+      text = Color3.fromRGB(238, 243, 244),
+      muted = Color3.fromRGB(100,100,100),
+      background = Color3.fromRGB(9, 18, 20),
+      primary = Color3.fromRGB(147, 221, 224),
+      secondary = Color3.fromRGB(23, 119, 137),
+      accent = Color3.fromRGB(28, 206, 241),
+      stroke = Color3.fromRGB(32, 210, 250),
+      activeColor = Color3.fromRGB(152,230,235),
+    },
+    ["Rainbow"] = {
+      text = Color3.fromHex("FA9189"),
+      muted = Color3.fromHex("FCAE7C"),
+      background = Color3.fromHex("FFE699"),
+      primary = Color3.fromHex("F9FFB5"),
+      secondary = Color3.fromHex("B3F5BC"),
+      accent = Color3.fromHex("D6F6FF"),
+      stroke = Color3.fromHex("E2CBF7"),
+      activeColor = Color3.fromHex("D1BDFF"),
+    },
+  },
+  SelectedTheme = "Purple",
+}
+
+-- // Utility Function
+do
+function Function:Init(folderName, fileName, content)
+  if not isfolder(folderName) then
+    makefolder(folderName)
+    if isfile(fileName) then
+      writefile(fileName, content)
+    end
+  else
+    return
+  end
+end
+function Function:Tween(object, goal, callback)
+  local TweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut)
+  local Tween = TweenService:Create(object, TweenInfo, goal)
+  Tween.Completed:Connect(callback or function() end)
+  Tween:Play()
+end
+function Function:ReturnProperty(Object)
+	if Object:IsA("Frame") or Object:IsA("TextButton") then
+		return "BackgroundColor3"
+	end 
+	if Object:IsA("-- ScrollingFrame") then
+		return "ScrollBarImageColor3"
+	end 
+	if Object:IsA("UIStroke") then
+		return "Color"
+	end 
+	if Object:IsA("TextLabel") or Object:IsA("TextBox") then
+		return "TextColor3"
+	end   
+	if Object:IsA("ImageLabel") or Object:IsA("ImageButton") then
+		return "ImageColor3"
+	end   
+end
+function Function:Round(number, factor)
+  local Result = math.floor(number/factor + (math.sign(number) * 0.5)) * factor
+	if Result < 0 then Result = Result + factor end
+	return Result
+end
+function Function:Draggable(gui)
+	local dragging
+	local dragInput
+	local dragStart
+	local startPos
+	local function update(input)
+		local delta = input.Position - dragStart
+		gui.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+	end
+	gui.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			dragging = true
+			dragStart = input.Position
+			startPos = gui.Position
+			input.Changed:Connect(function()
+				if input.UserInputState == Enum.UserInputState.End then
+					dragging = false
+				end
+			end)
+		end
+	end)
+	gui.InputChanged:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+			dragInput = input
+		end
+	end)
+	UserInputService.InputChanged:Connect(function(input)
+		if input == dragInput and dragging then
+			update(input)
+		end
+	end)
+end
+function Function:DestroyUI()
+  if CoreGui:FindFirstChild("hikariCheat") ~= nil or CoreGui:FindFirstChild("ErroGui") ~= nil then
+    CoreGui:FindFirstChild("hikariCheat"):Destroy()
+    CoreGui:FindFirstChild("ErroGui"):Destroy()
+  elseif gethui():FindFirstChild("hikariCheat") ~= nil or gethui():FindFirstChild("ErroGui") ~= nil then
+    gethui():FindFirstChild("hikariCheat"):Destroy()
+    gethui():FindFirstChild("ErroGui"):Destroy()
+  end
+end
+
+function Connections:BindConnection(name,connect)
+  if not Connections.connections[name] then
+    Connections.connections[name] = connect
+  else
+    Connections.connections[name]:Disconnect()
+    Connections.connections[name] = connect
+  end
+end
+function Connections:BindToRenderStep(name,func)
+  	local connect = game:GetService("RunService").RenderStepped:Connect(func)
+  	if not Connections.connections[name] then
+  		Connections.connections[name] = connect
+  	else
+  		Connections.connections[name]:Disconnect()
+  		Connections.connections[name] = connect
+  	end
+  end
+function Connections:BindToHeartbeat(name,func)
+  	local connect = game:GetService("RunService").Heartbeat:Connect(func)
+  	if not Connections.connections[name] then
+  		Connections.connections[name] = connect
+  	else
+  		Connections.connections[name]:Disconnect()
+  		Connections.connections[name] = connect
+  	end
+  end
+function Connections:BindToStep(name,func)
+  	local connect = game:GetService("RunService").Stepped:Connect(func)
+  	if not Connections.connections[name] then
+  		Connections.connections[name] = connect
+  	else
+  		Connections.connections[name]:Disconnect()
+  		Connections.connections[name] = connect
+  	end
+  end
+function Connections:UnbindConnection(name)
+  	if Connections.connections[name] then
+  		Connections.connections[name]:Disconnect()
+  	end
+  end
+
+Function:DestroyUI()
+Function:Init("Hikari", "Credits.txt", "made by cszn")
+end
+
+function Library:create(className, properties)
+    local inst = Instance.new(className)
+    for i, v in next, properties do
+      inst[i] = v
+    end
+    return inst
+end
+
+function Library:MakeWindow(WindowConfig)
+  WindowConfig = WindowConfig or {}
+  WindowConfig.Name = WindowConfig.Name or "Hikari Cheat"
+  WindowConfig.Subtitle = WindowConfig.Subtitle or "hikariCheat"
+  WindowConfig.Theme = WindowConfig.Theme or "Default"
+  WindowConfig.Intro = WindowConfig.Intro or false
+  WindowConfig.IntroIcon = WindowConfig.IntroIcon or ""
+  local Minimized = false
+  
+  do
+    Utility["GUI"] = Library:create("ScreenGui", {
+      DisplayOrder = 11, 
+      IgnoreGuiInset = true, 
+      Name = "hikariCheat", 
+      Parent = CoreGui,
+      ResetOnSpawn = false
+    })
+    Utility["Minimize"] = Library:create("Frame", {
+      Name = "Minimize",
+      AnchorPoint = Vector2.new(0.5, 0.5),
+      Position = UDim2.new(0.5, 250, 0.5, -110),
+      Size = UDim2.new(0, 30, 0, 30),
+      BorderSizePixel = 0,
+      BackgroundColor3 = Settings.Themes[WindowConfig.Theme].background,
+      Parent = Utility["GUI"]
+    })
+    Utility["MinimizeImage"] = Library:create("ImageLabel", {
+      Name = "MinimizeImage",
+      AnchorPoint = Vector2.new(0.5, 0.5),
+      Position = UDim2.new(0.5, 0, 0.5, 0),
+      Size = UDim2.new(0, 20, 0, 20),
+      BorderSizePixel = 0,
+      BackgroundTransparency = 1,
+      Image = "rbxassetid://7733771628",
+      ImageColor3 = Settings.Themes[WindowConfig.Theme].muted,
+      Parent = Utility["Minimize"]
+    })
+    Utility["Main"] = Library:create("Frame", {
+      Name = "hikariMain",
+      BorderSizePixel = 0,
+      AnchorPoint = Vector2.new(0.5, 0.5),
+      Position = UDim2.new(0.5, 0, 0.5, 0),
+      Size = UDim2.new(0, 420, 0, 290),
+      Parent = Utility["GUI"],
+      BackgroundTransparency = 0
+    })
+    Utility["Stroke2"] = Library:create("UIStroke", {
+      Color = Settings.Themes[WindowConfig.Theme].stroke,
+      Thickness = 1,
+      Parent = Utility["Main"]
+    })
+    Library:create("UIPadding", {
+      PaddingRight = UDim.new(0, 5),
+      PaddingTop = UDim.new(0, 5),
+      PaddingLeft = UDim.new(0, 5),
+      PaddingBottom = UDim.new(0, 5),
+      Parent = Utility["Main"]
+    })
+    Library:create("UICorner", {
+      Name = "Corner",
+      CornerRadius = UDim.new(0, 5),
+      Parent = Utility["Main"]
+    })
+    Library:create("UICorner", {
+      Name = "Corner",
+      CornerRadius = UDim.new(0, 10),
+      Parent = Utility["Minimize"]
+    })
+    
+    Utility["Gradient"] = Library:create("UIGradient", {
+      Name = "Gradient",
+      Parent = Utility["Main"],
+      Rotation = 45,
+      Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(Settings.Themes[WindowConfig.Theme].background.R + 10, Settings.Themes[WindowConfig.Theme].background.G + 10, Settings.Themes[WindowConfig.Theme].background.B + 10)), 
+        ColorSequenceKeypoint.new(1, Settings.Themes[WindowConfig.Theme].background),
+      }
+    })
+    
+    Utility["TabContainer"] = Library:create("Frame", {
+      Name = "container",
+      AnchorPoint = Vector2.new(1, 0),
+      BorderSizePixel = 0,
+      Position = UDim2.new(1, 0.5, 0, 0),
+      Size = UDim2.new(1, -11-115, 1, 0),
+      BackgroundColor3 = Settings.Themes[WindowConfig.Theme].primary,
+      BackgroundTransparency = 1,
+      Parent = Utility["Main"]
+    })
+    Utility["Folder"] = Library:create("Folder", {
+      Name = "TabsFolder",
+      Parent = Utility["TabContainer"]
+    })
+    Utility["Stroke1"] = Library:create("UIStroke", {
+      Color = Settings.Themes[WindowConfig.Theme].stroke,
+      Thickness = 1,
+      Parent = Utility["TabContainer"]
+    })
+    Library:create("UIPadding", {
+      PaddingTop = UDim.new(0, 1),
+      PaddingBottom = UDim.new(0, 1),
+      PaddingLeft = UDim.new(0, 1),
+      PaddingRight = UDim.new(0, 1),
+      Parent = Utility["TabContainer"]
+    })
+    Library:create("UICorner", {
+      Name = "Corner",
+      CornerRadius = UDim.new(0, 5),
+      Parent = Utility["TabContainer"]
+    })
+    
+    Function:Draggable(Utility["Main"])
+    Function:Draggable(Utility["Minimize"])
+    
+    Utility["Minimize"].InputBegan:Connect(function(input)
+      if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        Minimized = not Minimized
+        if Minimized then
+          Function:Tween(Utility["MinimizeImage"], {ImageColor3 = Settings.Themes[WindowConfig.Theme].activeColor})
+          Function:Tween(Utility["Main"], {Size = UDim2.new(0, 0, 0, 0)}, function()
+            Utility["Main"].Visible = false
+          end)
+        else
+          Utility["Main"].Visible = true
+          Function:Tween(Utility["MinimizeImage"], {ImageColor3 = Settings.Themes[WindowConfig.Theme].muted})
+          Function:Tween(Utility["Main"], {Size = UDim2.new(0, 420, 0, 290)})
+        end
+      end
+    end)
+  end
+  do
+    Utility["Navigation"] = Library:create("Frame", {
+      Name = "navigation",
+      BorderSizePixel = 0,
+      Position = UDim2.new(0, 0, 0, 0),
+      Size = UDim2.new(0, 120, 1, 0),
+      BackgroundColor3 = Settings.Themes[WindowConfig.Theme].primary,
+      BackgroundTransparency = 1,
+      Parent = Utility["Main"]
+    })
+    Utility["Holder"] = Library:create("ScrollingFrame", {
+      Name = "Holder",
+      BackgroundTransparency = 1,
+      BorderSizePixel = 0,
+      Position = UDim2.new(0, 0, 0, 42),
+      Size = UDim2.new(1, 0, 1, -43),
+      ClipsDescendants = true,
+      ScrollBarThickness = 0,
+      Parent = Utility["Navigation"]
+    })
+    Utility["Executor"] = Library:create("Frame", {
+      Name = "Executor",
+      BorderSizePixel = 0,
+      Size = UDim2.new(1, 0, 0, 40),
+      BackgroundColor3 = Settings.Themes[WindowConfig.Theme].primary,
+      BackgroundTransparency = 1,
+      Parent = Utility["Navigation"]
+    })
+    Utility["Lining"] = Library:create("Frame", {
+      Name = "line",
+      BorderSizePixel = 0,
+      AnchorPoint = Vector2.new(0, 1),
+      Size = UDim2.new(1, 0, 0, 1),
+      Position = UDim2.new(0, 0, 1, 0),
+      Parent = Utility["Executor"],
+      BackgroundColor3 = Settings.Themes[WindowConfig.Theme].stroke,
+    })
+    Utility["Title"] = Library:create("TextLabel", {
+      Name = "Title",
+      AnchorPoint = Vector2.new(0.5, 0.5),
+      Position = UDim2.new(0.5, 0, 0.5, -5),
+      BackgroundTransparency = 1,
+      Font = Enum.Font.GothamBlack,
+      TextColor3 = Settings.Themes[WindowConfig.Theme].text,
+      TextSize = 15,
+      Text = WindowConfig.Name,
+      Parent = Utility["Executor"]
+    })
+    Utility["Subtitle"] = Library:create("TextLabel", {
+      Name = "SubTitle",
+      AnchorPoint = Vector2.new(0.5, 0.5),
+      Position = UDim2.new(0.5, 0, 0.5, 6),
+      BackgroundTransparency = 1,
+      Font = Enum.Font.GothamBold,
+      TextColor3 = Settings.Themes[WindowConfig.Theme].activeColor,
+      TextSize = 10,
+      Text = WindowConfig.Subtitle,
+      Parent = Utility["Executor"]
+    })
+    Utility["Stroke3"] = Library:create("UIStroke", {
+      Color = Settings.Themes[WindowConfig.Theme].stroke,
+      Thickness = 1,
+      Parent = Utility["Navigation"]
+    })
+    Utility["HolderList"] = Library:create("UIListLayout", {
+      Padding = UDim.new(0, 3),
+      HorizontalAlignment = Enum.HorizontalAlignment.Center,
+      SortOrder = Enum.SortOrder.LayoutOrder,
+      Parent = Utility["Holder"]
+    })
+    Library:create("UIPadding", {
+      PaddingTop = UDim.new(0, 8),
+      PaddingBottom = UDim.new(0, 8),
+      Parent = Utility["Holder"]
+    })
+    Library:create("UICorner", {
+      Name = "Corner",
+      CornerRadius = UDim.new(0, 5),
+      Parent = Utility["Navigation"]
+    })
+  end
+  
+  do
+    if WindowConfig.Intro then
+      Utility["Minimize"].BackgroundTransparency = 1
+      Utility["Main"].BackgroundTransparency = 1
+      Utility["Minimize"].Visible = false
+      Utility["Main"].Visible = false
+      local Assets = game.Players:GetDescendants()
+      
+      Utility["IntroFrame"] = Library:create("Frame", {
+        Name = WindowConfig.Name.."Intro",
+        Size = UDim2.new(0, 420, 0, 290),
+        AnchorPoint = Vector2.new(0.5, 0.5),
+        Position = UDim2.new(0.5, 0, 0.5, 0),
+        BackgroundTransparency = 0,
+        Parent = Utility["GUI"]
+      })
+      Utility["IntroIcon"] = Library:create("ImageLabel", {
+        Name = "Icon",
+        Size = UDim2.new(0, 100, 0, 100),
+        Parent = Utility["IntroFrame"],
+        Image = WindowConfig.IntroIcon,
+        BackgroundTransparency = 1,
+        AnchorPoint = Vector2.new(0.5, 0.5),
+        Position = UDim2.new(0.5, 0, 0.5, 0)
+      })
+      Utility["IntroText"] = Library:create("TextLabel", {
+        Name = "Text",
+        Size = UDim2.new(1, 0, 0, 30),
+        Parent = Utility["IntroFrame"],
+        Text = "",
+        Font = Enum.Font.GothamBold,
+        TextSize = 20,
+        TextColor3 = Settings.Themes[WindowConfig.Theme].text,
+        RichText = true,
+        BackgroundTransparency = 1,
+        AnchorPoint = Vector2.new(0.5, 1),
+        Position = UDim2.new(0.5, 0, 1, -10)
+      })
+      Library:create("UICorner", {
+        CornerRadius = UDim.new(0, 50),
+        Parent = Utility["IntroIcon"]
+      })
+      Library:create("UICorner", {
+        CornerRadius = UDim.new(0, 5),
+        Parent = Utility["IntroFrame"]
+      })
+      Library:create("UIStroke", {
+        Color = Settings.Themes[WindowConfig.Theme].stroke,
+        Thickness = 1.3,
+        Parent = Utility["IntroIcon"]
+      })
+      
+      Utility["Gradient2"] = Library:create("UIGradient", {
+        Name = "Gradient2",
+        Parent = Utility["IntroFrame"],
+        Rotation = 45,
+        Color = ColorSequence.new{
+          ColorSequenceKeypoint.new(0, Color3.fromRGB(Settings.Themes[WindowConfig.Theme].background.R + 10, Settings.Themes[WindowConfig.Theme].background.G + 10, Settings.Themes[WindowConfig.Theme].background.B + 10)),  -- Bottom color
+          ColorSequenceKeypoint.new(1, Settings.Themes[WindowConfig.Theme].background) -- Top color
+        }
+      })
+      
+      TweenService:Create(Utility["IntroIcon"], TweenInfo.new(10, Enum.EasingStyle.Linear, Enum.EasingDirection.Out, -1, false, 0), {Rotation = 360}):Play()
+      
+      for i = 50, #Assets do
+        local Asset = Assets[i]
+        local Percentage = math.round(i/#Assets + 100)
+        
+        ContentProvider:PreloadAsync({Asset})
+        
+        Utility["IntroText"].Text = "Loading Assets: ( <font color='rgb(172,76,255)'>"..i.."/"..#Assets.."</font> )"
+        
+        if i == #Assets then
+          Function:Tween(Utility["IntroFrame"], {Size = UDim2.new(0,0,0,0)}, function()
+            Utility["IntroFrame"].Visible = false
+          end)
+          wait(0.50)
+          Function:Tween(Utility["Main"], {BackgroundTransparency = 0}, function()
+            Utility["Main"].Visible = true
+          end)
+          Function:Tween(Utility["Minimize"], {BackgroundTransparency = 0}, function()
+            Utility["Minimize"].Visible = true
+          end)
+        end
+      end
+    end
+  end
+  
+  local Tabs = {}
+  function Tabs:MakeTab(options)
+    options.Name = options.Name or "Tab"
+    options.Icon = options.Icon or ""
+    options.Default = options.Default or false
+    
+    do
+    Utility["TabContent"] = Library:create("Frame", {
+      Name = options.Name,
+      BackgroundTransparency = 1,
+      Size = UDim2.new(1, 0, 1, 0),
+      BorderSizePixel = 0,
+      Parent = Utility["Folder"],
+      Visible = false
+    })
+    Utility["TabContent2"] = Library:create("ScrollingFrame", {
+      Name = options.Name.."Content",
+      BackgroundTransparency = 1,
+      Size = UDim2.new(1, 0, 1, 0),
+      BorderSizePixel = 0,
+      ClipsDescendants = true,
+      ScrollBarThickness = 0,
+      Parent = Utility["TabContent"],
+    })
+    Utility["TabIndicator"] = Library:create("TextLabel", {
+      Name = options.Name.."Label",
+      BackgroundTransparency = 1,
+      AnchorPoint = Vector2.new(0.5, 0),
+      Position = UDim2.new(0.5, 0, 0, 3),
+      Font = Enum.Font.GothamBold,
+      TextSize = 13,
+      TextColor3 = Settings.Themes[WindowConfig.Theme].text,
+      Size = UDim2.new(1, 0, 0, 20),
+      Text = options.Name,
+      Parent = Utility["TabContent"]
+    })
+    Utility["ContentList"] = Library:create("UIListLayout", {
+      Padding = UDim.new(0, 3),
+      HorizontalAlignment = Enum.HorizontalAlignment.Center,
+      SortOrder = Enum.SortOrder.LayoutOrder,
+      Parent = Utility["TabContent2"]
+    })
+    Library:create("UIPadding", {
+      PaddingTop = UDim.new(0, 25),
+      PaddingBottom = UDim.new(0, 10),
+      PaddingLeft = UDim.new(0, 10),
+      PaddingRight = UDim.new(0, 10),
+      Parent = Utility["TabContent2"]
+     })
+    end
+    do
+    Utility["ButtonHolder"] = Library:create("Frame", {
+      Name = options.Name.."Button",
+      BorderSizePixel = 0,
+      AnchorPoint = Vector2.new(0.5, 0.5),
+      Position = UDim2.new(0.5, 0, 0.5, 0),
+      Size = UDim2.new(1, -10, 0, 20),
+      BackgroundColor3 = Settings.Themes[WindowConfig.Theme].primary,
+      BackgroundTransparency = 0.5,
+      Parent = Utility["Holder"]
+    })
+    Utility["ButtonLabel"] = Library:create("TextLabel", {
+      Name = "Title",
+      AnchorPoint = Vector2.new(0.5, 0.5),
+      Position = UDim2.new(0.5, 0, 0.5, 0),
+      BackgroundTransparency = 1,
+      Font = Enum.Font.GothamBold,
+      TextColor3 = Settings.Themes[WindowConfig.Theme].text,
+      TextSize = 10,
+      Text = options.Name,
+      TextXAlignment = Enum.TextXAlignment.Center,
+      Parent = Utility["ButtonHolder"]
+    })
+    Utility["Stroke4"] = Library:create("UIStroke", {
+      Name = 'Stroke',
+      Color = Settings.Themes[WindowConfig.Theme].stroke,
+      Thickness = 0.6,
+      Parent = Utility["ButtonHolder"]
+    })
+    Library:create("TextButton", {
+      Name = "Click",
+      Size = UDim2.new(1, 0, 1, 0),
+      AutoButtonColor = false,
+      Text = "",
+      BackgroundTransparency = 1,
+      BorderSizePixel = 0,
+      Parent = Utility["ButtonHolder"]
+    })
+    Library:create("UIPadding", {
+      PaddingRight = UDim.new(0, 5),
+      PaddingLeft = UDim.new(0, 5),
+      Parent = Utility["Holder"]
+    })
+    Library:create("UICorner", {
+      Name = "Corner",
+      CornerRadius = UDim.new(0, 5),
+      Parent = Utility["ButtonHolder"]
+    })
+    end
+    
+    local TabsFolder = Utility["Folder"]
+    local Tab = TabsFolder[options.Name]
+    local ElementHolder = Tab[options.Name.."Content"]
+    local TabLabel = Utility["TabContent"][options.Name.."Label"]
+    local TabButtonHolder = Utility["Holder"]
+    local TabButton = TabButtonHolder[options.Name.."Button"]
+    local TabClick = TabButtonHolder[options.Name.."Button"]["Click"]
+    local TabButtonLabel = TabButton["Title"]
+    local Stroke = TabButton["Stroke"]
+    local Corner = TabButton["Corner"]
+   
+    do
+    if options.Default then
+      Function:Tween(TabButtonLabel, {TextColor3 = Settings.Themes[WindowConfig.Theme].text})
+      Function:Tween(Stroke, {Color = Settings.Themes[WindowConfig.Theme].stroke})
+      Function:Tween(Corner, {CornerRadius = UDim.new(0, 20)})
+      Tab.Visible = true
+      TabLabel.Text = Tab.Name
+      
+      for i, ITAB in next, TabsFolder:GetChildren() do
+        if ITAB:IsA("ScrollingFrame") and ITAB ~= Tab then
+          ITAB.Visible = false
+        end
+      end
+    else
+      Function:Tween(TabButtonLabel, {TextColor3 = Settings.Themes[WindowConfig.Theme].muted})
+      Tab.Visible = false
+    end
+    
+    Utility["ContentList"]:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+      ElementHolder.CanvasSize = UDim2.new(0, 0, 0, Utility["ContentList"].AbsoluteContentSize.Y + 16)
+    end)
+    Utility["HolderList"]:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+      TabButtonHolder.CanvasSize = UDim2.new(0, 0, 0, Utility["HolderList"].AbsoluteContentSize.Y)
+    end)
+    TabClick.MouseButton1Click:Connect(function()
+      for _, ITab in next, TabsFolder:GetChildren() do
+        ITab.Visible = false
+      end
+      for _, item in pairs(TabButtonHolder:GetDescendants()) do
+        if item:IsA("Frame") and item.Name ~= options.Name.."Button" then
+          --print("Found item:", item[options.Name .. "Title"])
+          Function:Tween(item["Title"], {TextColor3 = Settings.Themes[WindowConfig.Theme].muted})
+          Function:Tween(item["Stroke"], {Color = Settings.Themes[WindowConfig.Theme].muted})
+          Function:Tween(item["Corner"], {CornerRadius = UDim.new(0, 5)})
+        end
+      end
+      
+      Tab.Visible = true
+      TabLabel.Text = Tab.Name
+      Function:Tween(TabButtonLabel, {TextColor3 = Settings.Themes[WindowConfig.Theme].text})
+      Function:Tween(Stroke, {Color = Settings.Themes[WindowConfig.Theme].stroke})
+      Function:Tween(Corner, {CornerRadius = UDim.new(0, 20)})
+    end)
+    end
+    
+    local Elements = {}
+    function Elements:AddButton(options)
+      options = options or {}
+      options.Name = options.Name or "Button"
+      options.Callback = options.Callback or function() end
+      local Hovering = false
+      
+      do
+        Utility["Button"] = Library:create("Frame", {
+          Name = options.Name.."Holder",
+          Size = UDim2.new(1, 0, 0, 25),
+          BackgroundColor3 = Settings.Themes[WindowConfig.Theme].accent,
+          BorderSizePixel = 0,
+          BackgroundTransparency = 0.5,
+          Parent = ElementHolder
+        })
+        Utility["ButtonTitle"] = Library:create("TextLabel", {
+          Name = "buttonTitle",
+          Size = UDim2.new(1, -20, 1, -1),
+          TextXAlignment = Enum.TextXAlignment.Left,
+          BackgroundTransparency = 1,
+          Font = Enum.Font.GothamBold,
+          Text = options.Name,
+          TextSize = 12,
+          Parent = Utility["Button"],
+          TextColor3 = Settings.Themes[WindowConfig.Theme].text,
+        })
+        Utility["Stroke5"] = Library:create("UIStroke", {
+          Name = "Stroke",
+          Color = Settings.Themes[WindowConfig.Theme].stroke,
+          Thickness = .5,
+          Parent = Utility["Button"]
+        })
+        Utility["Image1"] = Library:create("ImageLabel", {
+          Name = "buttonIcon",
+          AnchorPoint = Vector2.new(1, 0.5),
+          Position = UDim2.new(1, 0, 0.5, 0),
+          Size = UDim2.new(0, 15, 0, 15),
+          BackgroundTransparency = 1,
+          Image = "rbxassetid://7734010488",
+          Parent = Utility["Button"],
+          ImageColor3 = Settings.Themes[WindowConfig.Theme].text
+        })
+        Library:create("UIPadding", {
+          PaddingTop = UDim.new(0, 6),
+          PaddingBottom = UDim.new(0, 6),
+          PaddingLeft = UDim.new(0, 6),
+          PaddingRight = UDim.new(0, 6),
+          Parent = Utility["Button"]
+        })
+        Library:create("UICorner", {
+          Name = "Corner",
+          CornerRadius = UDim.new(0, 5),
+          Parent = Utility["Button"]
+        })
+      end
+      
+      local ButtonHolder = ElementHolder[options.Name.."Holder"]
+      
+      do
+        Utility["Button"].InputBegan:Connect(function(input)
+          if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            Hovering = true
+            Function:Tween(ButtonHolder["Stroke"], {Color = Settings.Themes[WindowConfig.Theme].activeColor})
+            task.spawn(function()
+              options.Callback()
+            end)
+            wait(0.25)
+            Function:Tween(ButtonHolder["Stroke"], {Color = Settings.Themes[WindowConfig.Theme].stroke})
+            Hovering = false
+          end
+        end)
+      end
+    end
+    function Elements:AddLabel(options)
+      options = options or {}
+      options.Text = options.Text or "Label"
+      options.Emoji = options.Emoji or "☁️"
+      
+      do
+        Utility["Label"] = Library:create("Frame", {
+          Name = options.Text .. "Label",
+          Size = UDim2.new(1, 0, 0, 25),
+          BackgroundColor3 = Settings.Themes[WindowConfig.Theme].accent,
+          BorderSizePixel = 0,
+          BackgroundTransparency = 0.5,
+          Parent = ElementHolder
+        })
+        Utility["Stroke7"] = Library:create("UIStroke", {
+          Name = "Stroke",
+          Color = Settings.Themes[WindowConfig.Theme].stroke,
+          Thickness = .5,
+          Parent = Utility["Label"]
+        })
+        Library:create("UIPadding", {
+          PaddingTop = UDim.new(0, 6),
+          PaddingBottom = UDim.new(0, 6),
+          PaddingLeft = UDim.new(0, 6),
+          PaddingRight = UDim.new(0, 6),
+          Parent = Utility["Label"]
+        })
+        Library:create("UICorner", {
+          Name = "Corner",
+          CornerRadius = UDim.new(0, 3),
+          Parent = Utility["Label"]
+        })
+        
+        Utility["LabelText"] = Library:create("TextLabel", {
+          Name = options.Text .. "Text",
+          Size = UDim2.new(1, -18, 1, 0),
+          TextXAlignment = Enum.TextXAlignment.Left,
+          BackgroundTransparency = 1,
+          Font = Enum.Font.GothamBold,
+          Text = options.Text,
+          TextSize = 12,
+          Parent = Utility["Label"],
+          TextColor3 = Settings.Themes[WindowConfig.Theme].text
+        })
+        Utility["IndicatorEmoji"] = Library:create("TextLabel", {
+          Name = options.Text.."Icon",
+          AnchorPoint = Vector2.new(0, 0.5),
+          Position = UDim2.new(0, -22, 0.5, 0),
+          Size = UDim2.new(0, 15, 0, 15),
+          BackgroundTransparency = 1,
+          TextSize = 13,
+          Text = options.Emoji,
+          Font = Enum.Font.GothamBold,
+          TextColor3 = Settings.Themes[WindowConfig.Theme].muted,
+          Parent = Utility["LabelText"]
+        })
+        Library:create("UIPadding", {
+          PaddingLeft = UDim.new(0, 26),
+          Parent = Utility["LabelText"]
+        })
+      end
+      
+    end
+    function Elements:AddToggle(options)
+      options = options or {}
+      options.Name = options.Name or "Button"
+      options.Default = options.Default or false
+      options.Callback = options.Callback or function() end
+      local Hovering = false
+      local Active = false 
+      
+      do
+        Utility["Toggle"] = Library:create("Frame", {
+          Name = options.Name .. "Toggle",
+          Size = UDim2.new(1, 0, 0, 25),
+          BackgroundColor3 = Settings.Themes[WindowConfig.Theme].accent,
+          BorderSizePixel = 0,
+          BackgroundTransparency = 0.5,
+          Parent = ElementHolder
+        })
+        Utility["ToggleTitle"] = Library:create("TextLabel", {
+          Name = options.Name .. "Title",
+          Size = UDim2.new(1, -20, 1, -1),
+          TextXAlignment = Enum.TextXAlignment.Left,
+          BackgroundTransparency = 1,
+          Font = Enum.Font.GothamBold,
+          Text = options.Name,
+          TextSize = 12,
+          Parent = Utility["Toggle"],
+          TextColor3 = Settings.Themes[WindowConfig.Theme].text,
+        })
+        Utility["Toggler"] = Library:create("Frame", {
+          Name = options.Name .. "Toggler",
+          AnchorPoint = Vector2.new(1, 0.5),
+          Position = UDim2.new(1, -3, 0.5, 0),
+          Size = UDim2.new(0, 15, 0, 15),
+          Parent = Utility["Toggle"],
+          BackgroundColor3 = Settings.Themes[WindowConfig.Theme].muted
+        })
+        Utility["Stroke6"] = Library:create("UIStroke", {
+          Name = "Stroke",
+          Color = Settings.Themes[WindowConfig.Theme].stroke,
+          Thickness = .5,
+          Parent = Utility["Toggle"]
+        })
+        Library:create("UIPadding", {
+          Parent = Utility["Toggle"],
+          PaddingTop = UDim.new(0, 6),
+          PaddingBottom = UDim.new(0, 6),
+          PaddingLeft = UDim.new(0, 6),
+          PaddingRight = UDim.new(0, 6)
+        })
+        Library:create("UICorner", {
+          CornerRadius = UDim.new(0, 20),
+          Parent = Utility["Toggler"]
+        })
+        Library:create("UICorner", {
+          Name = "Corner",
+          CornerRadius = UDim.new(0, 5),
+          Parent = Utility["Toggle"]
+        })
+        Utility["Stroke8"] = Library:create("UIStroke", {
+          Name = "Stroke",
+          Color = Settings.Themes[WindowConfig.Theme].stroke,
+          Thickness = .5,
+          Parent = Utility["Toggler"]
+        })
+      end
+      
+      local ToggleHolder = ElementHolder[options.Name.."Toggle"]
+      local Toggler = ToggleHolder[options.Name.."Toggler"]
+      
+      do
+        if options.Default then
+          Active = not Active
+          pcall(function()
+            options.Callback(Active)
+          end)
+          Function:Tween(Toggler, {BackgroundColor3 = Settings.Themes[WindowConfig.Theme].activeColor})
+        end
+        
+        ToggleHolder.InputBegan:Connect(function(input)
+          if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            Active = not Active
+            if Active then
+              Function:Tween(Toggler, {BackgroundColor3 = Settings.Themes[WindowConfig.Theme].activeColor})
+            else
+              Function:Tween(Toggler, {BackgroundColor3 = Settings.Themes[WindowConfig.Theme].muted})
+            end
+            local Success, Response = pcall(function()
+              options.Callback(Active)
+            end)
+            if not Success then
+              warn("Callback Error " ..tostring(Response))
+            end
+          end
+        end)
+      end
+    end
+    function Elements:AddSlider(options)
+      options = options or {}
+      options.Name = options.Name or "Slider"
+      options.Min = options.Min or 1
+      options.Max = options.Max or 100
+      options.Default = options.Default or 10
+      options.Increment = options.Increment or 1
+      options.ValueName = options.ValueName or ""
+      options.Callback = options.Callback or function() end
+      local Dragging = false
+      
+      local Slider = {Value = options.Default}
+      
+      do
+        Utility["Slider"] = Library:create("Frame", {
+          Name = options.Name.."Slider",
+          Size = UDim2.new(1, 0, 0, 42),
+          BackgroundColor3 = Settings.Themes[WindowConfig.Theme].accent,
+          BorderSizePixel = 0,
+          BackgroundTransparency = 0.5,
+          Parent = ElementHolder
+        })
+        Utility["SliderText"] = Library:create("TextLabel", {
+          Name = options.Name .. "Text",
+          Size = UDim2.new(1, -24, 1, -15),
+          TextXAlignment = Enum.TextXAlignment.Left,
+          BackgroundTransparency = 1,
+          Font = Enum.Font.GothamBold,
+          Text = options.Name,
+          TextSize = 12,
+          Parent = Utility["Slider"],
+          TextColor3 = Settings.Themes[WindowConfig.Theme].text,
+        })
+        Utility["SliderValue"] = Library:create("TextLabel", {
+          Name = options.Name.."Value",
+          AnchorPoint = Vector2.new(1, 0),
+          Position = UDim2.new(1, 0, 0, 0),
+          Size = UDim2.new(0, 24, 1, -15),
+          TextXAlignment = Enum.TextXAlignment.Right,
+          BackgroundTransparency = 1,
+          TextSize = 12,
+          Text = options.Default,
+          Parent = Utility["Slider"],
+          TextColor3 = Settings.Themes[WindowConfig.Theme].text,
+          Font = Enum.Font.Gotham
+        })
+        Library:create("UIStroke", {
+          Name = "Stroke",
+          Parent = Utility["Slider"],
+          Color = Settings.Themes[WindowConfig.Theme].stroke,
+          Thickness = .5
+        })
+        Library:create("UIPadding", {
+          Name = "Padding",
+          Parent = Utility["Slider"],
+          PaddingTop = UDim.new(0, 6),
+          PaddingBottom = UDim.new(0, 6),
+          PaddingLeft = UDim.new(0, 6),
+          PaddingRight = UDim.new(0, 6)
+        })
+        Library:create("UICorner", {
+          Name = "Corner",
+          CornerRadius = UDim.new(0, 5),
+          Parent = Utility["Slider"]
+        })
+        
+        Utility["SliderLine"] = Library:create("Frame", {
+          Name = options.Name.."Line",
+          BackgroundColor3 = Settings.Themes[WindowConfig.Theme].primary,
+          AnchorPoint = Vector2.new(0, 1),
+          Position = UDim2.new(0, 0, 1, 0),
+          Size = UDim2.new(1, 0, 0, 10),
+          Parent = Utility["Slider"]
+        })
+        Utility["SliderCircle"] = Library:create("Frame", {
+          Name = options.Name.."Circle",
+          Size = UDim2.new(0, 0, 1, 0),
+          Parent = Utility["SliderLine"],
+          BackgroundColor3 = Settings.Themes[WindowConfig.Theme].activeColor
+        })
+        Library:create("UICorner", {
+          Name = "Corner",
+          Parent = Utility["SliderLine"],
+          CornerRadius = UDim.new(0, 4)
+        })
+        Library:create("UICorner", {
+          Name = "Corner",
+          Parent = Utility["SliderCircle"],
+          CornerRadius = UDim.new(0, 4)
+        })
+        Library:create("UIStroke", {
+          Name = "Stroke",
+          Parent = Utility["SliderLine"],
+          Color = Settings.Themes[WindowConfig.Theme].muted
+        })
+      end
+      
+      local Mouse = LocalPlayer:GetMouse()
+      local SliderHolder = ElementHolder[options.Name.."Slider"]
+      local SliderValue = SliderHolder[options.Name.."Value"]
+      local SliderLine = SliderHolder[options.Name.."Line"]
+      local SliderCircle = SliderHolder[options.Name.."Line"][options.Name.."Circle"]
+      
+      do
+        SliderLine.InputBegan:Connect(function(Input)
+					if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then 
+						Dragging = true 
+					end 
+				end)
+				SliderLine.InputEnded:Connect(function(Input) 
+					if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then 
+						Dragging = false 
+					end 
+				end)
+        
+        UserInputService.InputChanged:Connect(function(Input)
+          if Dragging and (Input.UserInputType == Enum.UserInputType.MouseMovement or Input.UserInputType == Enum.UserInputType.Touch) then 
+						local SizeScale = math.clamp((Input.Position.X - SliderLine.AbsolutePosition.X) / SliderLine.AbsoluteSize.X, 0, 1)
+						Slider:SetValue(options.Min + ((options.Max - options.Min) * SizeScale)) 
+					end
+        end)
+        
+        function Slider:SetValue(value)
+          self.Value = math.clamp(Function:Round(value, options.Increment), options.Min, options.Max)
+          TweenService:Create(SliderCircle,TweenInfo.new(.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{Size = UDim2.fromScale((self.Value - options.Min) / (options.Max - options.Min), 1)}):Play()
+          SliderValue.Text = tostring(self.Value) .. " " .. options.ValueName
+					options.Callback(self.Value)
+        end
+        
+        Slider:SetValue(Slider.Value)
+        
+        SliderCircle.InputBegan:Connect(function(input)
+          if input.UserInputType == Enum.UserInputType.MouseButton1 or Enum.UserInputType.Touch then
+            Dragging = true
+          end
+        end)
+        SliderCircle.InputEnded:Connect(function(input)
+          if input.UserInputType == Enum.UserInputType.MouseButton1 or Enum.UserInputType.Touch then
+            Dragging = false
+          end
+        end)
+      end
+      
+    end
+    function Elements:AddTextBox(options)
+      options = options or {}
+      options.Name = options.Name or "Textbox"
+      options.Default = options.Default or ""
+      options.Placeholder = options.Placeholder or "Input Text"
+      options.ClearOnSubmit = options.ClearOnSubmit or false
+      options.Callback = options.Callback or function() end
+      
+      do
+        Utility["TextBox"] = Library:create("Frame", {
+          Name = options.Name.."TextBox",
+          Size = UDim2.new(1, 0, 0, 46),
+          BackgroundColor3 = Settings.Themes[WindowConfig.Theme].accent,
+          BorderSizePixel = 0,
+          BackgroundTransparency = 0.5,
+          Parent = ElementHolder
+        })
+        Utility["TextBoxText"] = Library:create("TextLabel", {
+          Name = options.Name .. "Text",
+          Size = UDim2.new(1, -24, 1, -18),
+          TextXAlignment = Enum.TextXAlignment.Left,
+          BackgroundTransparency = 1,
+          Font = Enum.Font.GothamBold,
+          Text = options.Name,
+          TextSize = 12,
+          Parent = Utility["TextBox"],
+          TextColor3 = Settings.Themes[WindowConfig.Theme].text,
+        })
+        Library:create("UIStroke", {
+          Name = "Stroke",
+          Parent = Utility["TextBox"],
+          Color = Settings.Themes[WindowConfig.Theme].stroke,
+          Thickness = .5
+        })
+        Library:create("UIPadding", {
+          Name = "Padding",
+          Parent = Utility["TextBox"],
+          PaddingTop = UDim.new(0, 6),
+          PaddingBottom = UDim.new(0, 6),
+          PaddingLeft = UDim.new(0, 6),
+          PaddingRight = UDim.new(0, 6)
+        })
+        Library:create("UICorner", {
+          Name = "Corner",
+          CornerRadius = UDim.new(0, 5),
+          Parent = Utility["TextBox"]
+        })
+        
+        Utility["TextBoxFrame"] = Library:create("Frame", {
+          Name = options.Name.."Frame",
+          BackgroundColor3 = Settings.Themes[WindowConfig.Theme].primary,
+          AnchorPoint = Vector2.new(0, 1),
+          Position = UDim2.new(0, 0, 1, 0),
+          Size = UDim2.new(1, 0, 0, 15),
+          Parent = Utility["TextBox"]
+        })
+        Utility["TextBoxInput"] = Library:create("TextBox", {
+          Name = options.Name.."Input",
+          BackgroundColor3 = Settings.Themes[WindowConfig.Theme].accent,
+          Size = UDim2.new(1, -5, 1, 0),
+          Position = UDim2.new(0, 5, 0, 0),
+          PlaceholderColor3 = Settings.Themes[WindowConfig.Theme].muted,
+          PlaceholderText = options.Placeholder,
+          TextColor3 = Settings.Themes[WindowConfig.Theme].text,
+          Font = Enum.Font.GothamSemibold,
+          TextXAlignment = Enum.TextXAlignment.Left,
+          BackgroundTransparency = 1,
+          TextSize = 12,
+          Text = options.Default,
+					ClipsDescendants = true,
+					ClearTextOnFocus = false,
+          Parent = Utility["TextBoxFrame"],
+        })
+        Library:create("UICorner", {
+          Name = "Corner",
+          Parent = Utility["TextBoxFrame"],
+          CornerRadius = UDim.new(0, 4)
+        })
+        Library:create("UICorner", {
+          Name = "Corner",
+          Parent = Utility["TextBoxInput"],
+          CornerRadius = UDim.new(0, 4)
+        })
+        Library:create("UIStroke", {
+          Name = "Stroke",
+          Parent = Utility["TextBoxFrame"],
+          Thickness = .5,
+          Color = Settings.Themes[WindowConfig.Theme].muted
+        })
+      end
+      
+      local TextBoxHolder = ElementHolder[options.Name.."TextBox"]
+      local TextBoxInput = ElementHolder[options.Name.."TextBox"][options.Name.."Frame"][options.Name.."Input"]
+      
+      TextBoxInput.FocusLost:Connect(function()
+        options.Callback(TextBoxInput.Text)
+        if options.ClearOnSubmit then
+          TextBoxInput.Text = ""
+        end
+      end)
+      
+      TextBoxInput.Text = options.Default
+      
+    end
+    function Elements:AddDropdown(options)
+      options = options or {}
+      options.Name = options.Name or "Textbox"
+      options.Default = options.Default or ""
+      options.Options = options.Options or {}
+      options.Callback = options.Callback or function() end
+      
+      local Dropdown = {Value = options.Default, Options = options.Options, Buttons = {}, Toggled = false, Tyep = "Dropdown"}
+      local MaxElements = 20
+      
+      do
+        Utility["Dropdown"] = Library:create("Frame", {
+          Name = options.Name .. "Dropdown",
+          Size = UDim2.new(1, 0, 0, 30),
+          BackgroundColor3 = Settings.Themes[WindowConfig.Theme].accent,
+          BorderSizePixel = 0,
+          ZIndex = 10,
+          BackgroundTransparency = 0.5,
+          Parent = ElementHolder
+        })
+        Utility["DropdownTitle"] = Library:create("TextLabel", {
+          Name = options.Name .. "Title",
+          Position = UDim2.new(0, 0, 0, -1),
+          Size = UDim2.new(1, -20, 0, 20),
+          TextXAlignment = Enum.TextXAlignment.Left,
+          BackgroundTransparency = 1,
+          RichText = true,
+          Font = Enum.Font.GothamBold,
+          Text = options.Name,
+          TextSize = 12,
+          Parent = Utility["Dropdown"],
+          TextColor3 = Settings.Themes[WindowConfig.Theme].text,
+        })
+        Utility["OptionHolder"] = Library:create("ScrollingFrame", {
+          Name = options.Name.."Holder",
+          Position = UDim2.new(0, 0, 0, 26),
+          Size = UDim2.new(1, 0, 1, -24),
+          BackgroundTransparency = 1,
+          BorderSizePixel = 0,
+          ClipsDescendants = true,
+          ScrollBarThickness = 0,
+          ZIndex = -10,
+          Parent = Utility["Dropdown"]
+        })
+        Utility["DropdownList"] = Library:create("UIListLayout", {
+          Padding = UDim.new(0, 3),
+          HorizontalAlignment = Enum.HorizontalAlignment.Center,
+          SortOrder = Enum.SortOrder.LayoutOrder,
+          Parent = Utility["OptionHolder"]
+        })
+        Utility["Click"] = Library:create("TextButton", {
+          Size = UDim2.new(1, 0, 0, 30),
+          AutoButtonColor = false,
+          Text = "",
+          BackgroundTransparency = 1,
+          BorderSizePixel = 0,
+          Parent = Utility["Dropdown"]
+        })
+        Library:create("UIStroke", {
+          Name = "Stroke",
+          Parent = Utility["Dropdown"],
+          Color = Settings.Themes[WindowConfig.Theme].stroke,
+          Thickness = .5
+        })
+        Library:create("UIPadding", {
+          PaddingTop = UDim.new(0, 6),
+          PaddingBottom = UDim.new(0, 6),
+          PaddingLeft = UDim.new(0, 6),
+          PaddingRight = UDim.new(0, 6),
+          Name = "Padding",
+          Parent = Utility["Dropdown"]
+        })
+        Library:create("UICorner", {
+          Name = "Corner",
+          CornerRadius = UDim.new(0, 3),
+          Parent = Utility["Dropdown"]
+        })
+        Library:create("ImageLabel", {
+          Name = "Icon",
+          AnchorPoint = Vector2.new(1, 0),
+          Position = UDim2.new(1, 0, 0, 0),
+          Size = UDim2.new(0, 20, 0, 20),
+          BackgroundTransparency = 1,
+          Rotation = 180,
+          Image = "rbxassetid://7072706796",
+          Parent = Utility["Dropdown"],
+          ImageColor3 = Settings.Themes[WindowConfig.Theme].text
+        })
+      end
+      
+      local DropdownHolder = ElementHolder[options.Name.."Dropdown"]
+      local DropdownOptions = DropdownHolder[options.Name .. "Holder"]
+      local DropdownTitle = DropdownHolder[options.Name .. "Title"]
+      local DropdownIcon = DropdownHolder["Icon"]
+      
+      do
+        if not table.find(Dropdown.Options, Dropdown.Value) then
+					Dropdown.Value = "..."
+        end
+        Utility["DropdownList"]:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+          DropdownOptions.CanvasSize = UDim2.new(0, 0, 0, Utility["DropdownList"].AbsoluteContentSize.Y)
+        end)
+        
+        function AddOption(Options)
+          for _, Option in pairs(Options) do
+            Utility["Option"] = Library:create("TextButton", {
+              Name = options.Name .. "Option",
+              Size = UDim2.new(1, 0, 0, 22),
+              BackgroundColor3 = Settings.Themes[WindowConfig.Theme].secondary,
+              Font = Enum.Font.Gotham,
+              BackgroundTransparency = 1,
+              TextSize = 12,
+              Text = Option,
+              BackgroundTransparency = 0.6,
+              Parent = DropdownOptions,
+              TextColor3 = Settings.Themes[WindowConfig.Theme].text,
+            })
+            Library:create("UIStroke", {
+              Name = "Stroke",
+              Parent = Utility["Option"],
+              Color = Settings.Themes[WindowConfig.Theme].stroke,
+              Thickness = .5
+            })
+            Library:create("UICorner", {
+              CornerRadius = UDim.new(0, 3),
+              Parent = Utility["Option"]
+            })
+            Utility["Option"].MouseButton1Click:Connect(function()
+              Dropdown:Set(Option)
+            end)
+            Dropdown.Buttons[Option] = Utility["Option"]
+          end
+        end
+        function Dropdown:Set(Value)
+          if not table.find(Dropdown.Options, Value) then
+            Dropdown.Value = "..."
+            DropdownTitle.Text = options.Name..": "..Dropdown.Value
+            return
+          end
+          
+          Dropdown.Value = Value
+          DropdownTitle.Text = options.Name..": "..Dropdown.Value
+					return options.Callback(Dropdown.Value)
+        end
+        function Dropdown:Refresh(Options, Delete)
+          if Delete then
+						for _,v in pairs(Dropdown.Buttons) do
+							v:Destroy()
+						end    
+						table.clear(Dropdown.Options)
+						table.clear(Dropdown.Buttons)
+					end
+					Dropdown.Options = Options
+					AddOption(Dropdown.Options)
+        end
+        
+        Utility["Click"].MouseButton1Click:Connect(function()
+          Dropdown.Toggled = not Dropdown.Toggled
+          TweenService:Create(DropdownIcon,TweenInfo.new(.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{Rotation = Dropdown.Toggled and -180 or 0}):Play()
+          if #Dropdown.Options > MaxElements then
+            TweenService:Create(DropdownHolder,TweenInfo.new(.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{Size = Dropdown.Toggled and UDim2.new(1, 0, 0, 30 + (MaxElements * 30 )) or UDim2.new(1, 0, 0, 30)}):Play()
+          else
+            TweenService:Create(DropdownHolder,TweenInfo.new(.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),{Size = Dropdown.Toggled and UDim2.new(1, 0, 0, Utility["DropdownList"].AbsoluteContentSize.Y + 30) or UDim2.new(1, 0, 0, 30)}):Play()
+          end
+        end)
+      end
+      
+      Dropdown:Refresh(Dropdown.Options, false)
+      Dropdown:Set(Dropdown.Value)
+      
+    end
+    return Elements
+  end
+  
+  return Tabs
+end
+function Library:ShowError(ErrorConfig)
+  ErrorConfig = ErrorConfig or {}
+  ErrorConfig.Text = ErrorConfig.Text or "Error Text"
+  ErrorConfig.Icon = ErrorConfig.Icon or ""
+  
+  do
+    Utility["GUI2"] = Library:create("ScreenGui", {
+      DisplayOrder = 11, 
+      IgnoreGuiInset = true, 
+      Name = "ErrorGui", 
+      Parent = CoreGui,
+      ResetOnSpawn = false
+    })
+    Utility["ErrorFrame"] = Library:create("Frame", {
+      Name = "Intro",
+      AnchorPoint = Vector2.new(0.5, 0.5),
+      Position = UDim2.new(0.5, 0, 0.5, 0),
+      Size = UDim2.new(0, 420, 0, 290),
+      BackgroundTransparency = 0,
+      BorderSizePixel = 0,
+      Parent = Utility["GUI2"]
+    })
+    Utility["ErrorIcon"] = Library:create("ImageLabel", {
+      Name = "Icon",
+      Size = UDim2.new(0, 100, 0, 100),
+      Parent = Utility["ErrorFrame"],
+      Image = ErrorConfig.Icon,
+      BackgroundTransparency = 1,
+      AnchorPoint = Vector2.new(0.5, 0.5),
+      Position = UDim2.new(0.5, 0, 0.5, 0)
+    })
+    Utility["ErrorText"] = Library:create("TextLabel", {
+      Name = "Text",
+      Size = UDim2.new(1, 0, 0, 30),
+      Parent = Utility["ErrorFrame"],
+      Text = ErrorConfig.Text,
+      Font = Enum.Font.GothamBold,
+      TextSize = 20,
+      TextColor3 = Color3.fromRGB(255, 140, 140),
+      RichText = true,
+      BackgroundTransparency = 1,
+      AnchorPoint = Vector2.new(0.5, 1),
+      Position = UDim2.new(0.5, 0, 1, -20)
+    })
+    
+    Library:create("UICorner", {
+      CornerRadius = UDim.new(0, 50),
+      Parent = Utility["ErrorIcon"]
+    })
+    Library:create("UICorner", {
+      CornerRadius = UDim.new(0, 5),
+      Parent = Utility["ErrorFrame"]
+    })
+    Library:create("UIStroke", {
+      Color = Color3.fromRGB(255, 120, 120),
+      Thickness = 1.3,
+      Parent = Utility["ErrorIcon"]
+    })
+    
+    TweenService:Create(Utility["ErrorIcon"], TweenInfo.new(10, Enum.EasingStyle.Linear, Enum.EasingDirection.Out, -1, false, 0), {Rotation = 360}):Play()
+    
+    Utility["Gradient"] = Library:create("UIGradient", {
+      Name = "Gradient",
+      Parent = Utility["ErrorFrame"],
+      Rotation = 45,
+      Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 55, 55)), -- Top color
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(37, 23, 23))  -- Bottom color
+      }
+    })
+  end 
+  
+  
+end
+
+local w = Library:MakeWindow({
+  Name = "Hikari",
+  Subtitle = "ShitAss",
+  Theme = "Purple",
+  Intro = true,
+  IntroIcon = "rbxassetid://15803005314"
+})
+local t1 = w:MakeTab({
+  Name = "Tab1",
+  Default = true
+})
