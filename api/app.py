@@ -19,7 +19,7 @@ def home():
   
 @app.route("/library", methods=["GET", "POST"])
 def library():
-  filePath = "../ds/gx"
+  filePath = "env/ws/gx"
   fileOpen = open(filePath, 'r')
   fileRead = fileOpen.read()
   return Response(fileRead, content_type="text/plain")
