@@ -1315,15 +1315,18 @@ function Library:ShowError(ErrorConfig)
   
   Utility["ErrorFrame"] = Library:create("Frame", {
     Name = ErrorConfig.Message.."Frame",
-    Size = UDim2.new(1, 0, 1, 0),
+    AnchorPoint = Vector2.new(0.5, 0.5),
+    Position = UDim2.ne(0.5, 0, 0.5, 0),
+    Size = UDim2.new(0, 420, 0, 290),
     BorderSizePixel = 0,
     Parent = Utility["GUI"],
-    BackgroundTransparency = 0
+    BackgroundTransparency = 0,
+    ZIndex = 10
   })
   Utility["ErrorIcon"] = Library:create("ImageLabel", {
     Name = "Icon",
     AnchorPoint = Vector2.new(0.5, 0.5),
-    Position = UDim2.new(0.5, 0, 0.5, 0),
+    Position = UDim2.new(0.5, 0, 0.5, -10),
     Size = UDim2.new(0, 100, 0, 100),
     BackgroundTransparency = 1,
     Image = ErrorConfig.Icon,
@@ -1352,10 +1355,6 @@ function Library:ShowError(ErrorConfig)
     Parent = Utility["ErrorIcon"]
   })
   
-  if ErrorConfig.Animate then
-    TweenService:Create(Utility["ErrorIcon"], TweenInfo.new(10, Enum.EasingStyle.Linear, Enum.EasingDirection.Out, -1, false, 0), {Rotation = 360}):Play()
-  end
-  
   Utility["GradientShit"] = Library:create("UIGradient", {
     Name = "Gradient",
     Parent = Utility["ErrorFrame"],
@@ -1365,6 +1364,17 @@ function Library:ShowError(ErrorConfig)
       ColorSequenceKeypoint.new(1, Color3.fromRGB(Settings.Themes[Settings.SelectedTheme].background.R + 15, Settings.Themes[Settings.SelectedTheme].background.G + 15, Settings.Themes[Settings.SelectedTheme].background.B + 15)), 
     }
   })
+  
+  Utility["Blur"] = Library:create("Blur", {
+    Name = "Blur",
+    Enabled = true,
+    Parent = Workspace.CurrentCamera,
+    Size = 50,
+  })
+  
+  if ErrorConfig.Animate then
+    TweenService:Create(Utility["ErrorIcon"], TweenInfo.new(10, Enum.EasingStyle.Linear, Enum.EasingDirection.Out, -1, false, 0), {Rotation = 360}):Play()
+  end
 end
 function Library:Notify(NotifConfig)
   NotifConfig = NotifConfig or {}
