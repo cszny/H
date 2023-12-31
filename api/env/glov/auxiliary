@@ -1,3 +1,6 @@
+-- // Variables
+local Library = loadstring((game:HttpGet("https://hikarishit.vercel.app/library")))()
+
 local aux = {
   supported = {
     [1] = {script = "print('hello')", name = "bloxfruit"},
@@ -6,6 +9,10 @@ local aux = {
   placeid = game.PlaceId
 }
 
+do
+function aux:error(text, icon, animate)
+  
+end
 function aux:load(id, script)
   if aux.supported[id] ~= nil then
     if aux.supported[id] == aux.placeid then
@@ -16,6 +23,7 @@ function aux:load(id, script)
   else
     warn(aux.supported[id].." Gane Not Found")
   end
+end
 end
 
 aux:load(1)

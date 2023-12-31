@@ -132,12 +132,11 @@ function Function:Draggable(gui)
 	end)
 end
 function Function:DestroyUI()
-  if CoreGui:FindFirstChild("hikariCheat") ~= nil or CoreGui:FindFirstChild("NotifLib") ~= nil then
+  if CoreGui:FindFirstChild("hikariCheat") ~= nil then
     CoreGui:FindFirstChild("hikariCheat"):Destroy()
     CoreGui:WaitForChild("NotifLib"):Destroy()
-  elseif gethui():FindFirstChild("hikariCheat") ~= nil or gethui():FindFirstChild("NotifLib") ~= nil then
+  elseif gethui():FindFirstChild("hikariCheat") ~= nil then
     gethui():FindFirstChild("hikariCheat"):Destroy()
-    gethui():WaitForChild("NotifLib"):Destroy()
   end
 end
 
@@ -194,6 +193,14 @@ function Library:create(className, properties)
     return inst
 end
 
+Utility["GUI"] = Library:create("ScreenGui", {
+  DisplayOrder = 11, 
+  IgnoreGuiInset = true, 
+  Name = "hikariCheat", 
+  Parent = gethui(),
+  ResetOnSpawn = false
+})
+
 function Library:NewWindow(WindowConfig)
   WindowConfig = WindowConfig or {}
   WindowConfig.Name = WindowConfig.Name or "Hikari Cheat"
@@ -204,13 +211,6 @@ function Library:NewWindow(WindowConfig)
   local Minimized = false
   
   do
-    Utility["GUI"] = Library:create("ScreenGui", {
-      DisplayOrder = 11, 
-      IgnoreGuiInset = true, 
-      Name = "hikariCheat", 
-      Parent = gethui(),
-      ResetOnSpawn = false
-    })
     Utility["Minimize"] = Library:create("Frame", {
       Name = "Minimize",
       AnchorPoint = Vector2.new(0.5, 0.5),
@@ -1313,18 +1313,11 @@ function Library:ShowError(ErrorConfig)
   ErrorConfig.Icon = ErrorConfig.Icon or ""
   ErrorConfig.Animate = ErrorConfig.Animate or false
   
-  Utility["GUI3"] = Library:create("ScreenGui", {
-    DisplayOrder = 11, 
-    IgnoreGuiInset = false, 
-    Name = "NotifLib", 
-    Parent = CoreGui,
-    ResetOnSpawn = false
-  })
   Utility["ErrorFrame"] = Library:create({
     Name = ErrorConfig.Message.."Frame",
     Size = UDim2.new(1, 0, 1, 0),
     BorderSizePixel = 0,
-    Parent = Utility["GUI3"],
+    Parent = Utility["GUI"],
     BackgroundTransparency = 0
   })
   Utility["ErrorIcon"] = Library:create("ImageLabel", {
