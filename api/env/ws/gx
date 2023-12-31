@@ -1313,11 +1313,6 @@ function Library:ShowError(ErrorConfig)
   ErrorConfig.Icon = ErrorConfig.Icon or ""
   ErrorConfig.Animate = ErrorConfig.Animate or false
   
-  Utility["BlurFrame"] = Library:create("Frame", {
-    Size = UDim2.new(1, 0, 1, 0),
-    BackgroundTransparency = 1,
-    Parent = Utility["GUI"]
-  })
   Utility["ErrorFrame"] = Library:create("Frame", {
     Name = ErrorConfig.Message.."Frame",
     AnchorPoint = Vector2.new(0.5, 0.5),
@@ -1376,21 +1371,13 @@ function Library:ShowError(ErrorConfig)
   Utility["Blur"] = Library:create("BlurEffect", {
     Name = "Blur",
     Enabled = true,
-    Parent = Utility["BlurFrame"],
-    Size = 10,
+    Parent = workspace.Lighting,
+    Size = 35,
   })
   
   if ErrorConfig.Animate then
     TweenService:Create(Utility["ErrorIcon"], TweenInfo.new(10, Enum.EasingStyle.Linear, Enum.EasingDirection.Out, -1, false, 0), {Rotation = 360}):Play()
   end
-  Connections:BindToRenderStep("BlurEffect", function()
-    local camera = workspace.CurrentCamera
-    local camPos = camera.CFrame.Position
-    local framePosition = Utility["ErrorFrame"].Position
-    local offset = (camPos - Vector3.new(framePosition.X.Offset, framePosition.Y.Offset, 0)).magnitude
-    
-    Utility["Blur"].Size = offset / 10
-  end)
 end
 function Library:Notify(NotifConfig)
   NotifConfig = NotifConfig or {}
