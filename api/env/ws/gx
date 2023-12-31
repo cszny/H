@@ -1318,7 +1318,7 @@ function Library:ShowError(ErrorConfig)
     Size = UDim2.new(1, 0, 1, 0),
     BorderSizePixel = 0,
     Parent = Utility["GUI"],
-    BackgroundTransparency = 0
+    BackgroundTransparency = 0.3
   })
   Utility["ErrorIcon"] = Library:create("ImageLabel", {
     Name = "Icon",
