@@ -1336,7 +1336,7 @@ function Library:ShowError(ErrorConfig)
     Size = UDim2.new(1, 0, 0, 30),
     TextSize = 20,
     Font = Enum.Font.GothamSemibold,
-    Text = upper(ErrorConfig.Message),
+    Text = ErrorConfig.Message,
     TextColor3 = Color3.fromRGB(172,76,255),
     BackgroundTransparency = 1,
     Parent = Utility["ErrorFrame"]
