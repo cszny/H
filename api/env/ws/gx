@@ -268,8 +268,8 @@ function Library:NewWindow(WindowConfig)
       Parent = Utility["Main"],
       Rotation = 45,
       Color = ColorSequence.new{
-        ColorSequenceKeypoint.new(0, Settings.Themes[WindowConfig.Theme].background),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(Settings.Themes[WindowConfig.Theme].background.R + 10, Settings.Themes[WindowConfig.Theme].background.G + 10, Settings.Themes[WindowConfig.Theme].background.B + 10)), 
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(Settings.Themes[Settings.SelectedTheme].background.R + 10, Settings.Themes[Settings.SelectedTheme].background.G + 10, Settings.Themes[Settings.SelectedTheme].background.B + 10)), 
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(Settings.Themes[Settings.SelectedTheme].background.R + 15, Settings.Themes[Settings.SelectedTheme].background.G + 15, Settings.Themes[Settings.SelectedTheme].background.B + 15)), 
       }
     })
     
@@ -463,8 +463,8 @@ function Library:NewWindow(WindowConfig)
         Parent = Utility["IntroFrame"],
         Rotation = 45,
         Color = ColorSequence.new{
-          ColorSequenceKeypoint.new(0, Settings.Themes[WindowConfig.Theme].background),
-          ColorSequenceKeypoint.new(1, Color3.fromRGB(Settings.Themes[WindowConfig.Theme].background.R + 10, Settings.Themes[WindowConfig.Theme].background.G + 10, Settings.Themes[WindowConfig.Theme].background.B + 10)),  -- Bottom color
+          ColorSequenceKeypoint.new(0, Color3.fromRGB(Settings.Themes[Settings.SelectedTheme].background.R + 10, Settings.Themes[Settings.SelectedTheme].background.G + 10, Settings.Themes[Settings.SelectedTheme].background.B + 10)), 
+          ColorSequenceKeypoint.new(1, Color3.fromRGB(Settings.Themes[Settings.SelectedTheme].background.R + 15, Settings.Themes[Settings.SelectedTheme].background.G + 15, Settings.Themes[Settings.SelectedTheme].background.B + 15)), 
         }
       })
       
@@ -1361,8 +1361,8 @@ function Library:ShowError(ErrorConfig)
     Parent = Utility["ErrorFrame"],
     Rotation = 45,
     Color = ColorSequence.new{
-      ColorSequenceKeypoint.new(0, Settings.Themes[Settings.SelectedTheme].background),
-      ColorSequenceKeypoint.new(1, Color3.fromRGB(Settings.Themes[Settings.SelectedTheme].background.R + 10, Settings.Themes[Settings.SelectedTheme].background.G + 10, Settings.Themes[Settings.SelectedTheme].background.B + 10)), 
+      ColorSequenceKeypoint.new(0, Color3.fromRGB(Settings.Themes[Settings.SelectedTheme].background.R + 10, Settings.Themes[Settings.SelectedTheme].background.G + 10, Settings.Themes[Settings.SelectedTheme].background.B + 10)), 
+      ColorSequenceKeypoint.new(1, Color3.fromRGB(Settings.Themes[Settings.SelectedTheme].background.R + 15, Settings.Themes[Settings.SelectedTheme].background.G + 15, Settings.Themes[Settings.SelectedTheme].background.B + 15)), 
     }
   })
 end
