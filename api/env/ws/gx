@@ -1313,7 +1313,7 @@ function Library:ShowError(ErrorConfig)
   ErrorConfig.Icon = ErrorConfig.Icon or ""
   ErrorConfig.Animate = ErrorConfig.Animate or false
   
-  Utility["ErrorFrame"] = Library:create({
+  Utility["ErrorFrame"] = Library:create("Frame", {
     Name = ErrorConfig.Message.."Frame",
     Size = UDim2.new(1, 0, 1, 0),
     BorderSizePixel = 0,
