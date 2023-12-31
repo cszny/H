@@ -1385,7 +1385,7 @@ function Library:ShowError(ErrorConfig)
     local framePosition = Utility["ErrorFrame"].Position
     local offset = (camPos - Vector3.new(framePosition.X.Offset, framePosition.Y.Offset, 0)).magnitude
     
-    Utility["BlurEffect"].Size = offset / 10
+    Utility["Blur"].Size = offset / 10
   end)
 end
 function Library:Notify(NotifConfig)
