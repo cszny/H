@@ -1,1 +1,21 @@
-print("hello auxiliary peeps")
+local aux = {
+  supported = {
+    [1] = {script = "print('hello')", name = "bloxfruit"},
+    [2] = {script = "", name = "bee swarm simulator"}
+  },
+  placeid = game.PlaceId
+}
+
+function aux:load(id, script)
+  if aux.supported[id] ~= nil then
+    if aux.supported[id] == aux.placeid then
+      loadstring(aux.supported[id].script)()
+    else
+      warn(aux.supported[id].." Game Not Supported")
+    end
+  else
+    warn(aux.supported[id].." Gane Not Found")
+  end
+end
+
+aux:load(1)
