@@ -1371,7 +1371,7 @@ function Library:ShowError(ErrorConfig)
   Utility["Blur"] = Library:create("BlurEffect", {
     Name = "Blur",
     Enabled = true,
-    Parent = workspace.Lighting,
+    Parent = game.Lighting,
     Size = 35,
   })
   
