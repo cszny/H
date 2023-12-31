@@ -208,7 +208,7 @@ function Library:NewWindow(WindowConfig)
       DisplayOrder = 11, 
       IgnoreGuiInset = true, 
       Name = "hikariCheat", 
-      Parent = CoreGui,
+      Parent = gethui(),
       ResetOnSpawn = false
     })
     Utility["Minimize"] = Library:create("Frame", {
@@ -1372,9 +1372,6 @@ function Library:Notify(NotifConfig)
   })
 
   wait(NotifConfig.Time)
-  Function:Tween(Utility["NotifFrame"], {Size = Udim2.new(0, 0, 0, 0)}, function()
-    Utility["GUI2"]:Destroy()
-  end)
   
 end
 
