@@ -1361,8 +1361,8 @@ function Library:ShowError(ErrorConfig)
     Parent = Utility["ErrorFrame"],
     Rotation = 45,
     Color = ColorSequence.new{
-      ColorSequenceKeypoint.new(0, Color3.fromRGB(Settings.Themes[SelectedTheme.Theme].background.R + 10, Settings.Themes[SelectedTheme.Theme].background.G + 10, Settings.Themes[SelectedTheme.Theme].background.B + 10)), 
-      ColorSequenceKeypoint.new(1, Settings.Themes[SelectedTheme.Theme].background),
+      ColorSequenceKeypoint.new(0, Color3.fromRGB(Settings.Themes[Settings.SelectedTheme].background.R + 10, Settings.Themes[Settings.SelectedTheme].background.G + 10, Settings.Themes[Settings.SelectedTheme].background.B + 10)), 
+      ColorSequenceKeypoint.new(1, Settings.Themes[Settings.SelectedTheme].background),
     }
   })
 end
