@@ -1325,8 +1325,7 @@ function Library:ShowError(ErrorConfig)
     Size = UDim2.new(0, 420, 0, 290),
     BorderSizePixel = 0,
     Parent = Utility["GUI"],
-    BackgroundTransparency = 0,
-    ZIndex = 10
+    BackgroundTransparency = 0
   })
   Utility["ErrorIcon"] = Library:create("ImageLabel", {
     Name = "Icon",
@@ -1383,7 +1382,10 @@ function Library:ShowError(ErrorConfig)
   Connections:BindToRenderStep("BlurEffect", function()
     local camera = workspace.CurrentCamera
     local camPos = camera.CFrame.Position
-    Utility["Blur"].Position = Vector2.new(camPos.X, camPos.Y)
+    local framePosition = Utility["ErrorFrame"].Position
+    local offset = (camPos - Vector3.new(framePosition.X.Offset, framePosition.Y.Offset, 0)).magnitude
+    
+    Utility["BlurEffect"].Size = offset / 10
   end)
 end
 function Library:Notify(NotifConfig)
