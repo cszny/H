@@ -1353,6 +1353,10 @@ function Library:ShowError(ErrorConfig)
     CornerRadius = UDim.new(0, 50),
     Parent = Utility["ErrorIcon"]
   })
+  Utility["FrameRadius"] = Library:create("UICorner", {
+    CornerRadius = UDim.new(0, 10),
+    Parent = Utility["ErrorFrame"]
+  })
   Utility["IconStroke"] = Library:create("UIStroke", {
     Color = Color3.fromRGB(172,76,255),
     Thickness = 3,
