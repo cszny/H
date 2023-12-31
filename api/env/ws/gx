@@ -23,7 +23,7 @@ local Settings = {
       secondary = Color3.fromRGB(30, 30, 30),
       accent = Color3.fromRGB(10, 10, 10),
       stroke = Color3.fromRGB(50, 50, 50),
-      activeColor = Color3.fromRGB(104,255,160),
+      activeColor = Color3.fromRGB(172,76,255),
     },
     ["Purple"] = {
       text = Color3.fromRGB(238, 238, 240),
@@ -268,8 +268,8 @@ function Library:NewWindow(WindowConfig)
       Parent = Utility["Main"],
       Rotation = 45,
       Color = ColorSequence.new{
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(Settings.Themes[WindowConfig.Theme].background.R + 10, Settings.Themes[WindowConfig.Theme].background.G + 10, Settings.Themes[WindowConfig.Theme].background.B + 10)), 
-        ColorSequenceKeypoint.new(1, Settings.Themes[WindowConfig.Theme].background),
+        ColorSequenceKeypoint.new(0, Settings.Themes[WindowConfig.Theme].background),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(Settings.Themes[WindowConfig.Theme].background.R + 10, Settings.Themes[WindowConfig.Theme].background.G + 10, Settings.Themes[WindowConfig.Theme].background.B + 10)), 
       }
     })
     
@@ -463,14 +463,14 @@ function Library:NewWindow(WindowConfig)
         Parent = Utility["IntroFrame"],
         Rotation = 45,
         Color = ColorSequence.new{
-          ColorSequenceKeypoint.new(0, Color3.fromRGB(Settings.Themes[WindowConfig.Theme].background.R + 10, Settings.Themes[WindowConfig.Theme].background.G + 10, Settings.Themes[WindowConfig.Theme].background.B + 10)),  -- Bottom color
-          ColorSequenceKeypoint.new(1, Settings.Themes[WindowConfig.Theme].background) -- Top color
+          ColorSequenceKeypoint.new(0, Settings.Themes[WindowConfig.Theme].background),
+          ColorSequenceKeypoint.new(1, Color3.fromRGB(Settings.Themes[WindowConfig.Theme].background.R + 10, Settings.Themes[WindowConfig.Theme].background.G + 10, Settings.Themes[WindowConfig.Theme].background.B + 10)),  -- Bottom color
         }
       })
       
       TweenService:Create(Utility["IntroIcon"], TweenInfo.new(10, Enum.EasingStyle.Linear, Enum.EasingDirection.Out, -1, false, 0), {Rotation = 360}):Play()
       
-      for i = 50, #Assets do
+      for i = 1, #Assets do
         local Asset = Assets[i]
         local Percentage = math.round(i/#Assets + 100)
         
@@ -1332,7 +1332,7 @@ function Library:ShowError(ErrorConfig)
   Utility["ErrorMessage"] = Library:create("TextLabel", {
     Name = "Message",
     AnchorPoint = Vector2.new(1, 1),
-    Position = UDim2.new(1, 0, 1, -20),
+    Position = UDim2.new(1, 0, 1, -30),
     Size = UDim2.new(1, 0, 0, 30),
     TextSize = 20,
     Font = Enum.Font.GothamSemibold,
@@ -1343,7 +1343,7 @@ function Library:ShowError(ErrorConfig)
   })
   
   Utility["IconRadius"] = Library:create("UICorner", {
-    CornerRadius = UDim.new(0, 10),
+    CornerRadius = UDim.new(0, 50),
     Parent = Utility["ErrorIcon"]
   })
   Utility["IconStroke"] = Library:create("UIStroke", {
@@ -1361,8 +1361,8 @@ function Library:ShowError(ErrorConfig)
     Parent = Utility["ErrorFrame"],
     Rotation = 45,
     Color = ColorSequence.new{
-      ColorSequenceKeypoint.new(0, Color3.fromRGB(Settings.Themes[Settings.SelectedTheme].background.R + 10, Settings.Themes[Settings.SelectedTheme].background.G + 10, Settings.Themes[Settings.SelectedTheme].background.B + 10)), 
-      ColorSequenceKeypoint.new(1, Settings.Themes[Settings.SelectedTheme].background),
+      ColorSequenceKeypoint.new(0, Settings.Themes[Settings.SelectedTheme].background),
+      ColorSequenceKeypoint.new(1, Color3.fromRGB(Settings.Themes[Settings.SelectedTheme].background.R + 10, Settings.Themes[Settings.SelectedTheme].background.G + 10, Settings.Themes[Settings.SelectedTheme].background.B + 10)), 
     }
   })
 end
