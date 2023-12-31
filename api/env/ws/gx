@@ -1325,7 +1325,8 @@ function Library:Notify(NotifConfig)
     Parent = Utility["GUI2"],
     AnchorPoint = Vector2.new(1, 1),
     Position = UDim2.new(1, -10, 1, -10),
-    Size = UDim2.new(0, 200, 0, 50),
+    Size = UDim2.new(0, 200, 0, 0),
+    AutomaticSize = Enum.AutomaticSize.Y,
     BackgroundColor3 = Settings.Themes[Settings.SelectedTheme].accent,
     BorderSizePixel = 0
   })
@@ -1333,8 +1334,8 @@ function Library:Notify(NotifConfig)
     Name = 'Text',
     Parent = Utility["NotifFrame"],
     AnchorPoint = Vector2.new(0, 0.5),
-    Size = UDim2.new(1, -10, 0, 30),
-    Position = UDim2.new(0, 10, 0.5, 5),
+    Size = UDim2.new(1, -10, 0, 35),
+    Position = UDim2.new(0, 10, 0.5, 10),
     Text = NotifConfig.Text,
     BackgroundTransparency = 1,
     Font = Enum.Font.GothamSemibold,
@@ -1346,20 +1347,18 @@ function Library:Notify(NotifConfig)
     Name = 'ZLabel',
     Parent = Utility["NotifFrame"],
     Size = UDim2.new(1, -10, 0, 10),
-    Position = UDim2.new(0, 10, 0, -10),
+    Position = UDim2.new(0, 10, 0, -20),
     Text = NotifConfig.Label,
     BackgroundTransparency = 1,
     Font = Enum.Font.Gotham,
     TextSize = 10,
-    TextTruncate = Enum.TextTruncate.AtEnd,
     TextWrapped = true,
     TextXAlignment = Enum.TextXAlignment.Left,
     TextColor3 = Settings.Themes[Settings.SelectedTheme].muted
   })
   
   Library:create("UIListLayout", {
-    Padding = UDim.new(0, 2),
-    HorizontalAlignment = Enum.HorizontalAlignment.Center,
+    Padding = UDim.new(0, 1),
     Parent = Utility["NotifFrame"]
   })
   Library:create("UICorner", {
