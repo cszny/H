@@ -1318,7 +1318,7 @@ function Library:ShowError(ErrorConfig)
     Size = UDim2.new(1, 0, 1, 0),
     BorderSizePixel = 0,
     Parent = Utility["GUI"],
-    BackgroundTransparency = 0.3
+    BackgroundTransparency = 0
   })
   Utility["ErrorIcon"] = Library:create("ImageLabel", {
     Name = "Icon",
@@ -1332,14 +1332,24 @@ function Library:ShowError(ErrorConfig)
   Utility["ErrorMessage"] = Library:create("TextLabel", {
     Name = "Message",
     AnchorPoint = Vector2.new(1, 1),
-    Position = UDim2.new(1, 0, 1, -10),
+    Position = UDim2.new(1, 0, 1, -20),
     Size = UDim2.new(1, 0, 0, 30),
     TextSize = 20,
     Font = Enum.Font.GothamSemibold,
-    Text = ErrorConfig.Message,
+    Text = upper(ErrorConfig.Message),
     TextColor3 = Color3.fromRGB(172,76,255),
     BackgroundTransparency = 1,
     Parent = Utility["ErrorFrame"]
+  })
+  
+  Utility["IconRadius"] = Library:create("UICorner", {
+    CornerRadius = UDim.new(0, 10),
+    Parent = Utility["ErrorIcon"]
+  })
+  Utility["IconStroke"] = Library:create("UIStroke", {
+    Color = Color3.fromRGB(172,76,255),
+    Thickness = 3,
+    Parent = Utility["ErrorIcon"]
   })
   
   if ErrorConfig.Animate then
@@ -1351,8 +1361,8 @@ function Library:ShowError(ErrorConfig)
     Parent = Utility["ErrorFrame"],
     Rotation = 45,
     Color = ColorSequence.new{
-      ColorSequenceKeypoint.new(0, Color3.fromRGB(Settings.Themes[WindowConfig.Theme].background.R + 10, Settings.Themes[WindowConfig.Theme].background.G + 10, Settings.Themes[WindowConfig.Theme].background.B + 10)), 
-      ColorSequenceKeypoint.new(1, Settings.Themes[WindowConfig.Theme].background),
+      ColorSequenceKeypoint.new(0, Color3.fromRGB(Settings.Themes[SelectedTheme.Theme].background.R + 10, Settings.Themes[SelectedTheme.Theme].background.G + 10, Settings.Themes[SelectedTheme.Theme].background.B + 10)), 
+      ColorSequenceKeypoint.new(1, Settings.Themes[SelectedTheme.Theme].background),
     }
   })
 end
