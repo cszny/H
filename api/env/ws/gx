@@ -428,6 +428,7 @@ function Library:NewWindow(WindowConfig)
       Utility["Main"].BackgroundTransparency = 1
       Utility["Minimize"].Visible = false
       Utility["Main"].Visible = false
+      Utility["Blur"].Enabled = true
       local Assets = game.Players:GetDescendants()
       
       Utility["IntroFrame"] = Library:create("Frame", {
@@ -496,6 +497,7 @@ function Library:NewWindow(WindowConfig)
         
         if i == #Assets then
           Function:Tween(Utility["IntroFrame"], {Size = UDim2.new(0,0,0,0)}, function()
+            Utility["Blur"].Enabled = false
             Utility["IntroFrame"].Visible = false
           end)
           wait(0.50)
