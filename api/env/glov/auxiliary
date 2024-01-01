@@ -28,6 +28,24 @@ function aux:load(id, script)
     aux:error("Game Not Found.", "rbxassetid://15812489989", true)
   end
 end
+function aux:print(string)
+  print(string)
+end
 end
 
-aux:load(3)
+local Window = Library:NewWindow({
+  Name = "Hikari",
+  Subtitle = "ShitAss",
+  Intro = false
+})
+local Tab1 = Window:NewTab({
+  Name = "Tab1",
+  Default = true
+})
+
+Tab1:AddButton({
+  Name = "Button",
+  Callback = function()
+    aux:print("Hello, World!")
+  end
+})

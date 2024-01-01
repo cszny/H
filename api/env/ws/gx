@@ -58,7 +58,8 @@ local Settings = {
   },
   Properties = {
     MainSize = UDim2.new(0, 400, 0, 270),
-    Centered = Vector2.new(0.5, 0.5) or UDim2.new(0.5, 0, 0.5, 0)
+    CenteredAnchor = Vector2.new(0.5, 0.5),
+    CenteredPosition = UDim2.new(0.5, 0, 0.5, 0)
   },
   SelectedTheme = "Default",
 }
@@ -249,8 +250,8 @@ function Library:NewWindow(WindowConfig)
     Utility["Main"] = Library:create("Frame", {
       Name = "hikariMain",
       BorderSizePixel = 0,
-      AnchorPoint = Settings.Properties.Centered,
-      Position = Settings.Properties.Centered,
+      AnchorPoint = Settings.Properties.CenteredAnchor,
+      Position = Settings.Properties.CenteredPosition,
       Size = Settings.Properties.MainSize,
       Parent = Utility["GUI"],
       BackgroundTransparency = 0
@@ -334,7 +335,7 @@ function Library:NewWindow(WindowConfig)
         else
           Utility["Main"].Visible = true
           Function:Tween(Utility["MinimizeImage"], {ImageColor3 = Settings.Themes[WindowConfig.Theme].muted})
-          Function:Tween(Utility["Main"], {Size = UDim2.new(0, 400, 0, 270)})
+          Function:Tween(Utility["Main"], {Size = Settings.Properties.MainSize})
         end
       end
     end)
@@ -431,7 +432,7 @@ function Library:NewWindow(WindowConfig)
       
       Utility["IntroFrame"] = Library:create("Frame", {
         Name = WindowConfig.Name.."Intro",
-        Size = UDim2.new(0, 400, 0, 270),
+        Size = Settings.Properties.MainSize,
         AnchorPoint = Vector2.new(0.5, 0.5),
         Position = UDim2.new(0.5, 0, 0.5, 0),
         BackgroundTransparency = 0,
@@ -1330,16 +1331,16 @@ function Library:ShowError(ErrorConfig)
   
   Utility["ErrorFrame"] = Library:create("Frame", {
     Name = ErrorConfig.Message.."Frame",
-    AnchorPoint = Vector2.new(0.5, 0.5),
-    Position = UDim2.new(0.5, 0, 0.5, 0),
-    Size = UDim2.new(0, 400, 0, 270),
+    AnchorPoint = Settings.Properties.CenteredAnchor,
+    Position = Settings.Properties.CenteredPosition,
+    Size = Settings.Properties.MainSize,
     BorderSizePixel = 0,
     Parent = Utility["GUI"],
     BackgroundTransparency = 0
   })
   Utility["ErrorIcon"] = Library:create("ImageLabel", {
     Name = "Icon",
-    AnchorPoint = Vector2.new(0.5, 0.5),
+    AnchorPoint = Settings.Properties.CenteredAnchor,
     Position = UDim2.new(0.5, 0, 0.5, -10),
     Size = UDim2.new(0, 100, 0, 100),
     BackgroundTransparency = 1,
