@@ -56,6 +56,10 @@ local Settings = {
       activeColor = Color3.fromHex("D1BDFF"),
     },
   },
+  Properties = {
+    MainSize = UDim2.new(0, 400, 0, 270),
+    Centered = Vector2.new(0.5, 0.5) or UDim2.new(0.5, 0, 0.5, 0)
+  },
   SelectedTheme = "Default",
 }
 
@@ -134,9 +138,14 @@ end
 function Function:DestroyUI()
   if CoreGui:FindFirstChild("hikariCheat") ~= nil then
     CoreGui:FindFirstChild("hikariCheat"):Destroy()
-    CoreGui:WaitForChild("NotifLib"):Destroy()
   elseif gethui():FindFirstChild("hikariCheat") ~= nil then
     gethui():FindFirstChild("hikariCheat"):Destroy()
+  elseif CoreGui:FindFirstChild("hikariCheat") ~= nil and game.Lighting:FindFirstChild("Blur") ~= nil then
+    CoreGui:FindFirstChild("hikariCheat"):Destroy()
+    game.Lighting:FindFirstChild("Blur"):Destroy()
+  elseif gethui():FindFirstChild("hikariCheat") ~= nil and game.Lighting:FindFirstChild("Blur") ~= nil then
+    gethui():FindFirstChild("hikariCheat"):Destroy()
+    game.Lighting:FindFirstChild("Blur"):Destroy()
   end
 end
 
@@ -200,6 +209,12 @@ Utility["GUI"] = Library:create("ScreenGui", {
   Parent = gethui(),
   ResetOnSpawn = false
 })
+Utility["Blur"] = Library:create("BlurEffect", {
+  Name = "Blur",
+  Enabled = false,
+  Parent = game.Lighting,
+  Size = 35,
+})
 
 function Library:NewWindow(WindowConfig)
   WindowConfig = WindowConfig or {}
@@ -234,9 +249,9 @@ function Library:NewWindow(WindowConfig)
     Utility["Main"] = Library:create("Frame", {
       Name = "hikariMain",
       BorderSizePixel = 0,
-      AnchorPoint = Vector2.new(0.5, 0.5),
-      Position = UDim2.new(0.5, 0, 0.5, 0),
-      Size = UDim2.new(0, 420, 0, 290),
+      AnchorPoint = Settings.Properties.Centered,
+      Position = Settings.Properties.Centered,
+      Size = Settings.Properties.MainSize,
       Parent = Utility["GUI"],
       BackgroundTransparency = 0
     })
@@ -319,7 +334,7 @@ function Library:NewWindow(WindowConfig)
         else
           Utility["Main"].Visible = true
           Function:Tween(Utility["MinimizeImage"], {ImageColor3 = Settings.Themes[WindowConfig.Theme].muted})
-          Function:Tween(Utility["Main"], {Size = UDim2.new(0, 420, 0, 290)})
+          Function:Tween(Utility["Main"], {Size = UDim2.new(0, 400, 0, 270)})
         end
       end
     end)
@@ -416,7 +431,7 @@ function Library:NewWindow(WindowConfig)
       
       Utility["IntroFrame"] = Library:create("Frame", {
         Name = WindowConfig.Name.."Intro",
-        Size = UDim2.new(0, 420, 0, 290),
+        Size = UDim2.new(0, 400, 0, 270),
         AnchorPoint = Vector2.new(0.5, 0.5),
         Position = UDim2.new(0.5, 0, 0.5, 0),
         BackgroundTransparency = 0,
@@ -1317,7 +1332,7 @@ function Library:ShowError(ErrorConfig)
     Name = ErrorConfig.Message.."Frame",
     AnchorPoint = Vector2.new(0.5, 0.5),
     Position = UDim2.new(0.5, 0, 0.5, 0),
-    Size = UDim2.new(0, 420, 0, 290),
+    Size = UDim2.new(0, 400, 0, 270),
     BorderSizePixel = 0,
     Parent = Utility["GUI"],
     BackgroundTransparency = 0
@@ -1366,13 +1381,6 @@ function Library:ShowError(ErrorConfig)
       ColorSequenceKeypoint.new(0, Color3.fromRGB(Settings.Themes[Settings.SelectedTheme].background.R + 10, Settings.Themes[Settings.SelectedTheme].background.G + 10, Settings.Themes[Settings.SelectedTheme].background.B + 10)), 
       ColorSequenceKeypoint.new(1, Color3.fromRGB(Settings.Themes[Settings.SelectedTheme].background.R + 15, Settings.Themes[Settings.SelectedTheme].background.G + 15, Settings.Themes[Settings.SelectedTheme].background.B + 15)), 
     }
-  })
-  
-  Utility["Blur"] = Library:create("BlurEffect", {
-    Name = "Blur",
-    Enabled = true,
-    Parent = game.Lighting,
-    Size = 35,
   })
   
   if ErrorConfig.Animate then
