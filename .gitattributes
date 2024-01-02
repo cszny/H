@@ -2,3 +2,4 @@
 *.py linguist-detectable=false
 *.lua linguist-detectable=true
 *.hkr linguist-language=Hikari
+*.Hikari linguist-language=Hikari
