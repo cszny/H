@@ -1,0 +1,22 @@
+{
+  "name": "Hikari",
+  "scopeName": "source.hikari",
+  "fileTypes": ["hk", "hikari"],
+  "patterns": [
+    {
+      "name": "keyword.hikari",
+      "match": "\\b(hk|hkr|hkh)\\b"
+    },
+    {
+      "name": "string.hikari",
+      "begin": "\"",
+      "end": "\"",
+      "patterns": [
+        {
+          "name": "escape.hikari",
+          "match": "\\\\."
+        }
+      ]
+    }
+  ]
+}
