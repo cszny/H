@@ -22,4 +22,4 @@ def library():
   filePath = "api/env/ws/gx"
   fileOpen = open(filePath, 'r')
   fileRead = fileOpen.read()
-  return Response(fileRead, content_type="text/plain")
+  return render_template("library.html", fileRead=fileRead)
