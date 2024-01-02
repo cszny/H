@@ -33,19 +33,4 @@ function aux:print(string)
 end
 end
 
-local Window = Library:NewWindow({
-  Name = "Hikari",
-  Subtitle = "ShitAss",
-  Intro = false
-})
-local Tab1 = Window:NewTab({
-  Name = "Tab1",
-  Default = true
-})
-
-Tab1:AddButton({
-  Name = "Button",
-  Callback = function()
-    aux:print("Hello, World!")
-  end
-})
+aux:load(3)

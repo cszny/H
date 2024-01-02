@@ -214,7 +214,7 @@ Utility["Blur"] = Library:create("BlurEffect", {
   Name = "Blur",
   Enabled = false,
   Parent = game.Lighting,
-  Size = 35,
+  Size = 0,
 })
 
 function Library:NewWindow(WindowConfig)
@@ -431,6 +431,8 @@ function Library:NewWindow(WindowConfig)
       Utility["Blur"].Enabled = true
       local Assets = game.Players:GetDescendants()
       
+      Function:Tween(Utility["Blur"], {Size = 35})
+      
       Utility["IntroFrame"] = Library:create("Frame", {
         Name = WindowConfig.Name.."Intro",
         Size = Settings.Properties.MainSize,
@@ -497,6 +499,7 @@ function Library:NewWindow(WindowConfig)
         
         if i == #Assets then
           Function:Tween(Utility["IntroFrame"], {Size = UDim2.new(0,0,0,0)}, function()
+            Function:Tween(Utility["Blur"], {Size = 0})
             Utility["Blur"].Enabled = false
             Utility["IntroFrame"].Visible = false
           end)
@@ -1330,6 +1333,9 @@ function Library:ShowError(ErrorConfig)
   ErrorConfig.Message = ErrorConfig.Message or ""
   ErrorConfig.Icon = ErrorConfig.Icon or ""
   ErrorConfig.Animate = ErrorConfig.Animate or false
+  
+  Utility["Blur"].Enabled = true
+  Function:Tween(Utility["Blur"], {Size = 35})
   
   Utility["ErrorFrame"] = Library:create("Frame", {
     Name = ErrorConfig.Message.."Frame",
