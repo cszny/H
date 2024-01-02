@@ -1,3 +1,4 @@
 *.html linguist-detectable=false
 *.py linguist-detectable=false
 *.lua linguist-detectable=true
+*.hkr linguist-language=Hikari
