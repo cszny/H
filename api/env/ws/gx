@@ -1051,7 +1051,7 @@ function Library:NewWindow(WindowConfig)
     function Elements:AddTextBox(options)
       options = options or {}
       options.Name = options.Name or "Textbox"
-      options.Default = options.Default or nil
+      options.Default = options.Default or ""
       options.Placeholder = options.Placeholder or "Input Text"
       options.ClearOnSubmit = options.ClearOnSubmit or false
       options.Callback = options.Callback or function() end
