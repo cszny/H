@@ -1,0 +1,116 @@
+-- // Panda Settings
+local PVersion = "v2"
+local PType = "roblox"
+local PID = "quantumix"
+
+function hello()
+  print("Hiii")
+end
+
+-- // Variables
+local Library = loadstring((game:HttpGet("https://hikarishit.vercel.app/library")))()
+local PandaAuth = loadstring(game:HttpGet('https://pandadevelopment.net/servicelib?service='..PID..'&core='..PType..'&param='..PVersion))()
+local Notify = loadstring(game:HttpGet("https://raw.githubusercontent.com/x9PSwiftz/Panda/main/Notification.lua"))()
+local Player = game:GetService("Players")
+local aux = {
+  supported = {
+    [1] = {script = hello, name = "bloxfruit", code = 4483381587},
+    [2] = {script = "hehe", name = "bee swarm simulator", code = 1273812}
+  },
+  placeid = game.PlaceId
+}
+
+-- Auxiliary Functions
+do
+  function aux:error(text, icon, animate)
+    Library:ShowError({
+      Message = text,
+      Icon = icon,
+      Animate = animate
+    })
+  end
+  function aux:random(int)
+    local str = ""
+    for i = 1, int do
+      local num = "aux"..math.random(97, 122)
+      str = str .. string.char(num)
+    end
+    return tostring(str)
+  end
+  function aux:sub(fname, fname, content)
+    if not isfolder(fname) then
+      makefolder(fname)
+      wait(0.25)
+      writefile(fname.."/"..flname..".txt", content)
+      Notify.New("Auxiliary: Key Saved Successfully!")
+    elseif not isfile(fname.."/"..flname..".txt") then
+      writefile(fname.."/"..flname..".txt", content)
+      Notify.New("Auxiliary: Key Saved Successfully!")
+    else
+      writefile(fname.."/"..flname..".txt", content)
+      Notify.New("Auxiliary: Key Saved Successfully!")
+    end
+  end
+  function aux:gsub()
+    local gsubkey = PandaAuth:GetKey(PID)
+    return gsubkey
+  end
+  function aux:load(id, script, key)
+    if aux.supported[id] ~= nil then
+      if aux.supported[id].code == game.PlaceId then
+        local auxLogin = Library:NewWindow({
+          Name = "Hikari",
+          Subtitle = "Authorization",
+          Theme = "Default",
+          Intro = true,
+          IntroIcon = "rbxassetid://15812489989"
+        })
+        local auxTab = auxLogin:NewTab({
+          Name = "Login",
+          Default = true
+        })
+        
+        auxTab:AddTextBox({
+          Name = "Authorization Key",
+          Placeholder = "Enter Key Here",
+          Callback = function(v)
+            local key = v
+            if key then
+            pcall(function()
+              Notify.New("Auxiliary: Checking Key.")
+              wait(0.25)
+              if PandaAuth:ValidateKey(PID, key) then
+                Notify.New("Auxiliary: Entered key is correct.")
+                wait(0.25)
+                Notify.New("Auxiliary: Saving key...")
+                wait(0.25)
+                pcall(function()
+                  aux:sub("Hikari", "auth_key", key)
+                end)
+                return aux.supported[id].script
+              else
+                Notify.New("Auxiliary: Entered key is incorrect.")
+              end
+            end)
+            else
+              print("Jono")
+            end
+          end
+        })
+        auxTab:AddButton({
+          Name = "Get Key",
+          Callback = function()
+            Notify.New("Auxiliary: Link Copied to clipboard.")
+            setclipboard(tostring(aux:gsub()))
+          end
+        })
+      else
+        aux:error("Game Not Supported.", "rbxassetid://15812489989", true)
+      end
+    else
+      aux:error("Game Not Found.", "rbxassetid://15812489989", true)
+    end
+  end
+end
+
+aux:load(1)
