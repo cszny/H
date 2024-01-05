@@ -23,3 +23,10 @@ def library():
   fileOpen = open(filePath, 'r')
   fileRead = fileOpen.read()
   return render_template("library.html", fileRead=fileRead)
+
+@app.route("/notify", methods=["GET", "POST"])
+def notify():
+  filePath = "api/env/ws/px"
+  fileOpen = open(filePath, 'r')
+  fileRead = fileOpen.read()
+  return render_template("notif.html", fileRead=fileRead)

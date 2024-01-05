@@ -58,6 +58,7 @@ do
   function aux:load(id, script, key)
     if aux.supported[id] ~= nil then
       if aux.supported[id].code == game.PlaceId then
+        getgenv().key = ""
         local auxLogin = Library:NewWindow({
           Name = "Hikari",
           Subtitle = "Authorization",
@@ -75,7 +76,16 @@ do
           Placeholder = "Enter Key Here",
           Callback = function(v)
             local key = v
-            if key then
+            if not key == "" then
+              getgenv().key = key
+            else
+              Notify.new("No Key Entered!")
+            end
+          end
+        })
+        auxTab:AddButton({
+          Name = "Login",
+          Callback = function()
             pcall(function()
               Notify.New("Auxiliary: Checking Key.")
               wait(0.25)
@@ -85,16 +95,24 @@ do
                 Notify.New("Auxiliary: Saving key...")
                 wait(0.25)
                 pcall(function()
-                  aux:sub("Hikari", "auth_key", key)
+                  if not isfolder("Hikari") then
+                    makefolder("Hikari")
+                    wait(0.25)
+                    writefile("Hikari/auth_conf.txt", key)
+                    Notify.New("Auxiliary: Key Saved Successfully!")
+                  elseif not isfile("Hikari/auth_conf.txt") then
+                    writefile("Hikari/auth_conf.txt", key)
+                    Notify.New("Auxiliary: Key Saved Successfully!")
+                  else
+                    writefile("Hikari/auth_conf.txt", key)
+                    Notify.New("Auxiliary: Key Saved Successfully!")
+                  end
                 end)
-                return aux.supported[id].script
+                aux.supported[id].script()
               else
                 Notify.New("Auxiliary: Entered key is incorrect.")
               end
             end)
-            else
-              print("Jono")
-            end
           end
         })
         auxTab:AddButton({
@@ -104,6 +122,26 @@ do
             setclipboard(tostring(aux:gsub()))
           end
         })
+        
+        if isfile("Hikari/auth_conf.txt") then
+          file = readfile("Hikari/auth_conf.txt")
+          Notify.New("[Auxiliary]: Checking Saved Key...")
+          wait(0.25)
+          if PandaAuth:ValidateKey(PID, file) then
+            Notify.New("[Auxiliary]: Saved Key is Valid!")
+            wait(0.50)
+            Notify.New("[Auxiliary]: Please wait while we load the script.")
+            wait(0.25)
+            aux.supported[id].script()
+          else
+            Notify.New("[Auxiliary]: Saved key is Invalid.")
+            wait(0.25)
+            Notify.New("[Auxiliary]: Please get a new one.")
+          end
+        else
+          warn("[Auxiliary]: No saved key.")
+        end
+        
       else
         aux:error("Game Not Supported.", "rbxassetid://15812489989", true)
       end
