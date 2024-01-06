@@ -8,9 +8,9 @@ function hello()
 end
 
 -- // Variables
+local Notify = loadstring(game:HttpGet("https://hikarishit.vercel.app/notify"))()
 local Library = loadstring((game:HttpGet("https://hikarishit.vercel.app/library")))()
 local PandaAuth = loadstring(game:HttpGet('https://pandadevelopment.net/servicelib?service='..PID..'&core='..PType..'&param='..PVersion))()
-local Notify = loadstring(game:HttpGet("https://raw.githubusercontent.com/x9PSwiftz/Panda/main/Notification.lua"))()
 local Player = game:GetService("Players")
 local aux = {
   supported = {
@@ -22,6 +22,12 @@ local aux = {
 
 -- Auxiliary Functions
 do
+  function aux:print()
+    warn("  ·····································")
+    warn("      | Hikari Script HUB | v1.0 |")
+    warn("        | discord.gg/Jb4DP46PF8 |")
+    warn("  ·····································")
+  end
   function aux:error(text, icon, animate)
     Library:ShowError({
       Message = text,
@@ -56,6 +62,7 @@ do
     return gsubkey
   end
   function aux:load(id, script, key)
+    aux:print()
     if aux.supported[id] ~= nil then
       if aux.supported[id].code == game.PlaceId then
         getgenv().key = ""
@@ -76,16 +83,19 @@ do
           Placeholder = "Enter Key Here",
           Callback = function(v)
             local key = v
-            if not key == "" then
-              getgenv().key = key
+            if key == "" then
+              warn("[Auxiliary]: No Key Entered!")
             else
-              Notify.new("No Key Entered!")
+              getgenv().key = key
             end
           end
         })
         auxTab:AddButton({
           Name = "Login",
           Callback = function()
+            if getgenv().key == "" then
+              Notify.New("[Auxiliary]: No Entered Key.")
+            else
             pcall(function()
               Notify.New("Auxiliary: Checking Key.")
               wait(0.25)
@@ -113,6 +123,7 @@ do
                 Notify.New("Auxiliary: Entered key is incorrect.")
               end
             end)
+            end
           end
         })
         auxTab:AddButton({

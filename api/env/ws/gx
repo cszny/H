@@ -86,7 +86,7 @@ function Function:ReturnProperty(Object)
 	if Object:IsA("Frame") or Object:IsA("TextButton") then
 		return "BackgroundColor3"
 	end 
-	if Object:IsA("-- ScrollingFrame") then
+	if Object:IsA("ScrollingFrame") then
 		return "ScrollBarImageColor3"
 	end 
 	if Object:IsA("UIStroke") then
@@ -644,12 +644,6 @@ function Library:NewWindow(WindowConfig)
       Tab.Visible = false
     end
     
-    Utility["ContentList"]:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-      ElementHolder.CanvasSize = UDim2.new(0, 0, 0, Utility["ContentList"].AbsoluteContentSize.Y + 16)
-    end)
-    Utility["HolderList"]:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-      TabButtonHolder.CanvasSize = UDim2.new(0, 0, 0, Utility["HolderList"].AbsoluteContentSize.Y)
-    end)
     TabClick.MouseButton1Click:Connect(function()
       for _, ITab in next, TabsFolder:GetChildren() do
         ITab.Visible = false
@@ -1251,9 +1245,6 @@ function Library:NewWindow(WindowConfig)
         if not table.find(Dropdown.Options, Dropdown.Value) then
 					Dropdown.Value = "..."
         end
-        Utility["DropdownList"]:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-          DropdownOptions.CanvasSize = UDim2.new(0, 0, 0, Utility["DropdownList"].AbsoluteContentSize.Y)
-        end)
         
         function AddOption(Options)
           for _, Option in pairs(Options) do
