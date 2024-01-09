@@ -13,6 +13,9 @@ local Connections = {
 local Function = {}
 local Library = {}
 local Utility = {}
+local Hikari = {
+  Connections = {}
+}
 local Settings = {
   Themes = {
     ["Default"] = {
@@ -65,6 +68,27 @@ local Settings = {
 }
 
 -- // Utility Function
+function Library:create(className, properties)
+    local inst = Instance.new(className)
+    for i, v in next, properties do
+      inst[i] = v
+    end
+    return inst
+end
+
+Utility["GUI"] = Library:create("ScreenGui", {
+  DisplayOrder = 11, 
+  IgnoreGuiInset = true, 
+  Name = "hikariCheat", 
+  ResetOnSpawn = false
+})
+Utility["Blur"] = Library:create("BlurEffect", {
+  Name = "Blur",
+  Enabled = false,
+  Parent = game.Lighting,
+  Size = 0,
+})
+
 do
 function Function:Init(folderName, fileName, content)
   if not isfolder(folderName) then
@@ -192,47 +216,35 @@ function Connections:UnbindConnection(name)
   end
 
 function Hikari:IsRunning()
-  if CoreGui:FindFirstChild("hikariCheat") ~= nil then
-    CoreGui:FindFirstChild("hikariCheat"):Destroy()
-  elseif gethui():FindFirstChild("hikariCheat") ~= nil then
-    gethui():FindFirstChild("hikariCheat"):Destroy()
+  if gethui() then
+    return Utility["GUI"].Parent == gethui()
+  else
+    return Utility["GUI"].Parent == CoreGui
   end
 end
 
-local function AddConnection(Signal, Function)
+function AddConnection(Signal, Function)
 	if (not Hikari:IsRunning()) then
 		return
 	end
 	local SignalConnect = Signal:Connect(Function)
-	table.insert(OrionLib.Connections, SignalConnect)
+	table.insert(Hikari.Connections, SignalConnect)
 	return SignalConnect
 end
+
+task.spawn(function()
+	while (Hikari:IsRunning()) do
+		wait()
+	end
+
+	for _, Connection in next, Hikari.Connections do
+		Connection:Disconnect()
+	end
+end)
 
 Function:DestroyUI()
 Function:Init("Hikari", "Credits.txt", "made by cszn")
 end
-
-function Library:create(className, properties)
-    local inst = Instance.new(className)
-    for i, v in next, properties do
-      inst[i] = v
-    end
-    return inst
-end
-
-Utility["GUI"] = Library:create("ScreenGui", {
-  DisplayOrder = 11, 
-  IgnoreGuiInset = true, 
-  Name = "hikariCheat", 
-  Parent = gethui(),
-  ResetOnSpawn = false
-})
-Utility["Blur"] = Library:create("BlurEffect", {
-  Name = "Blur",
-  Enabled = false,
-  Parent = game.Lighting,
-  Size = 0,
-})
 
 function Library:NewWindow(WindowConfig)
   WindowConfig = WindowConfig or {}
@@ -1183,7 +1195,6 @@ function Library:NewWindow(WindowConfig)
       
       local Dropdown = {Value = options.Default, Options = options.Options, Buttons = {}, Toggled = false, Tyep = "Dropdown"}
       local MaxElements = 20
-      
       do
         Utility["Dropdown"] = Library:create("Frame", {
           Name = options.Name .. "Dropdown",
@@ -1267,6 +1278,7 @@ function Library:NewWindow(WindowConfig)
 					Utility["Dropdown"].CanvasSize = UDim2.new(0, 0, 0, Utility["DropdownList"].AbsoluteContentSize.Y)
 				end)  
       end
+      
       
       local DropdownHolder = ElementHolder[options.Name.."Dropdown"]
       local DropdownOptions = DropdownHolder[options.Name .. "Holder"]
