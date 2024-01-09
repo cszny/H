@@ -3198,7 +3198,7 @@ Weapons = {
 }
 FastType = {
 	"Normal",
-	"ExTra"
+	"Extra"
 }
 FastDelay = {
 	"Normal",

@@ -191,6 +191,23 @@ function Connections:UnbindConnection(name)
   	end
   end
 
+function Hikari:IsRunning()
+  if CoreGui:FindFirstChild("hikariCheat") ~= nil then
+    CoreGui:FindFirstChild("hikariCheat"):Destroy()
+  elseif gethui():FindFirstChild("hikariCheat") ~= nil then
+    gethui():FindFirstChild("hikariCheat"):Destroy()
+  end
+end
+
+local function AddConnection(Signal, Function)
+	if (not Hikari:IsRunning()) then
+		return
+	end
+	local SignalConnect = Signal:Connect(Function)
+	table.insert(OrionLib.Connections, SignalConnect)
+	return SignalConnect
+end
+
 Function:DestroyUI()
 Function:Init("Hikari", "Credits.txt", "made by cszn")
 end
@@ -408,7 +425,8 @@ function Library:NewWindow(WindowConfig)
       Padding = UDim.new(0, 3),
       HorizontalAlignment = Enum.HorizontalAlignment.Center,
       SortOrder = Enum.SortOrder.LayoutOrder,
-      Parent = Utility["Holder"]
+      Parent = Utility["Holder"],
+      Name = "List"
     })
     Library:create("UIPadding", {
       PaddingTop = UDim.new(0, 8),
@@ -420,6 +438,11 @@ function Library:NewWindow(WindowConfig)
       CornerRadius = UDim.new(0, 5),
       Parent = Utility["Navigation"]
     })
+    
+    
+    AddConnection(Utility["Holder"].List:GetPropertyChangedSignal("AbsoluteContentSize"), function()
+      Utility["Holder"].CanvasSize = UDim2.new(0, 0, 0, Utility["Holder"].List.AbsoluteContentSize.Y + 16)
+	  end)
   end
   
   do
@@ -553,6 +576,7 @@ function Library:NewWindow(WindowConfig)
     })
     Utility["ContentList"] = Library:create("UIListLayout", {
       Padding = UDim.new(0, 3),
+      Name = "List",
       HorizontalAlignment = Enum.HorizontalAlignment.Center,
       SortOrder = Enum.SortOrder.LayoutOrder,
       Parent = Utility["TabContent2"]
@@ -564,6 +588,10 @@ function Library:NewWindow(WindowConfig)
       PaddingRight = UDim.new(0, 10),
       Parent = Utility["TabContent2"]
      })
+   
+   AddConnection(Utility["TabContent2"].List:GetPropertyChangedSignal("AbsoluteContentSize"), function()
+			Utility["TabContent2"].CanvasSize = UDim2.new(0, 0, 0, Utility["TabContent2"].List.AbsoluteContentSize.Y + 30)
+		end)
     end
     do
     Utility["ButtonHolder"] = Library:create("Frame", {
@@ -1182,7 +1210,7 @@ function Library:NewWindow(WindowConfig)
         Utility["OptionHolder"] = Library:create("ScrollingFrame", {
           Name = options.Name.."Holder",
           Position = UDim2.new(0, 0, 0, 26),
-          Size = UDim2.new(1, 0, 1, -24),
+          Size = UDim2.new(1, 0, 1, -50),
           BackgroundTransparency = 1,
           BorderSizePixel = 0,
           ClipsDescendants = true,
@@ -1234,6 +1262,10 @@ function Library:NewWindow(WindowConfig)
           Parent = Utility["Dropdown"],
           ImageColor3 = Settings.Themes[WindowConfig.Theme].text
         })
+        
+        AddConnection(Utility["DropdownList"]:GetPropertyChangedSignal("AbsoluteContentSize"), function()
+					Utility["Dropdown"].CanvasSize = UDim2.new(0, 0, 0, Utility["DropdownList"].AbsoluteContentSize.Y)
+				end)  
       end
       
       local DropdownHolder = ElementHolder[options.Name.."Dropdown"]
