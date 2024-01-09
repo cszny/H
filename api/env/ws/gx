@@ -80,14 +80,9 @@ Utility["GUI"] = Library:create("ScreenGui", {
   DisplayOrder = 11, 
   IgnoreGuiInset = true, 
   Name = "hikariCheat", 
+  Parent = gethui(),
   ResetOnSpawn = false
 })
-if syn then
-	syn.protect_gui(Utility["GUI"])
-	Utility['GUI'].Parent = game.CoreGui
-else
-	Utility["GUI"].Parent = gethui() or game.CoreGui
-end
 Utility["Blur"] = Library:create("BlurEffect", {
   Name = "Blur",
   Enabled = false,
